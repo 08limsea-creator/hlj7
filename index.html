@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🕰 2030 타임캡슐 — 나의 포트폴리오</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: 'Segoe UI', 'Malgun Gothic', sans-serif; margin: 0; background: #faf7ff; color: #333; }
+    header { background: linear-gradient(135deg, #a18cd1, #fbc2eb); padding: 50px 20px 40px; text-align: center; color: #fff; }
+    header img.profile { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 4px solid rgba(255,255,255,.7); box-shadow: 0 4px 12px rgba(0,0,0,.15); }
+    header h1 { margin: 14px 0 6px; font-size: 1.9em; }
+    header .role { margin: 0 0 4px; font-weight: 600; opacity: .95; }
+    header .catch { margin: 0; opacity: .85; font-style: italic; }
+    .container { max-width: 860px; margin: 0 auto; padding: 30px 16px; }
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; }
+    .card { background: #fff; border-radius: 14px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,.08); display: flex; flex-direction: column; }
+    .card img { width: 100%; height: 170px; object-fit: cover; background: #eee; }
+    .card .body { padding: 16px 18px 18px; display: flex; flex-direction: column; flex: 1; }
+    .card h2 { margin: 0 0 8px; font-size: 1.1em; }
+    .card p { margin: 0 0 14px; font-size: .93em; line-height: 1.55; color: #555; flex: 1; }
+    .card a.btn { align-self: flex-start; text-decoration: none; background: #7c5fc9; color: #fff; padding: 8px 14px; border-radius: 20px; font-size: .85em; }
+    .card a.btn:hover { background: #66489e; }
+    .outro { background: #fff; border-radius: 14px; padding: 22px; margin-top: 24px; box-shadow: 0 2px 10px rgba(0,0,0,.08); text-align: center; }
+    footer { text-align: center; padding: 28px 16px; color: #999; font-size: .85em; }
+  </style>
+</head>
+<body>
+  <header>
+    <!-- Day 1 미래 프로필 이미지 (images/profile.png 로 교체됩니다) -->
+    <img class="profile" src="images/profile.png" alt="2030 프로필">
+    <h1>🕰 2030년의 나</h1>
+    <p class="role">닉네임 · 2030 미래 직함을 여기에</p>
+    <p class="catch">"캐치프레이즈를 여기에"</p>
+  </header>
+
+  <div class="container">
+    <div class="cards">
+      <div class="card">
+        <img src="images/day1_poster.png" alt="Day 1 나 사용설명서">
+        <div class="body">
+          <h2>🌅 Day 1 — 나 사용설명서</h2>
+          <p>VARK·MBTI·가치 단어로 나를 분석하고, 2030년의 나를 설계했다. 미래 명함과 AI 비서까지 — 여정의 시작.</p>
+          <a class="btn" href="day1-me/">📂 산출물 보기</a>
+        </div>
+      </div>
+      <div class="card">
+        <img src="images/day2_infographic.png" alt="Day 2 인포그래픽">
+        <div class="body">
+          <h2>📊 Day 2 — 데이터로 검증한 미래 사업</h2>
+          <p>구미시 상가 20,286곳의 실제 데이터를 수사해 내 사업의 가능성을 숫자로 증명했다. 감이 아니라 데이터로!</p>
+          <a class="btn" href="day2-data/">📂 산출물 보기</a>
+        </div>
+      </div>
+      <div class="card">
+        <img src="images/day3_character.png" alt="Day 3 캐릭터">
+        <div class="body">
+          <h2>🎭 Day 3 — 나의 캐릭터 IP</h2>
+          <p>세상에 없던 캐릭터를 만들어 성격과 세계관을 입히고 SNS로 데뷔시켰다. 원작자는 나!</p>
+          <a class="btn" href="day3-character/">📂 산출물 보기</a>
+        </div>
+      </div>
+      <div class="card">
+        <img src="images/day4_brand.png" alt="Day 4 브랜드">
+        <div class="body">
+          <h2>🛍️ Day 4 — 나의 브랜드</h2>
+          <p>내 캐릭터를 전속 모델로 K-브랜드를 론칭했다. 로고부터 굿즈, 한/영 카피까지 담은 룩북 완성.</p>
+          <a class="btn" href="day4-brand/">📂 산출물 보기</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="outro">
+      <h2>🌐 타임캡슐 개봉</h2>
+      <p>5일간의 여정 소감 한 줄을 여기에 남겨 보세요.</p>
+    </div>
+  </div>
+
+  <footer>구미여상 AI 5일 과정 · 이 페이지는 예시입니다 — Day 5에 ChatGPT와 함께 나만의 디자인으로 바꿔 보세요!<br>
+  이미지 경로는 <code>images/</code> 폴더의 영문 파일명 5장(profile · day1_poster · day2_infographic · day3_character · day4_brand)과 연결되어 있습니다.</footer>
+</body>
+</html>

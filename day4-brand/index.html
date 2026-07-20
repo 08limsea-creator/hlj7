@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>📦 산출물 폴더로 이동 중…</title>
+</head>
+<body style="font-family:'Segoe UI','Malgun Gothic',sans-serif;text-align:center;padding:70px 20px;color:#444;background:#faf7ff;">
+  <p style="font-size:1.3em;">📦 산출물 폴더로 이동 중…</p>
+  <p id="fallback" style="display:none;color:#777;line-height:1.7;">
+    이 페이지는 GitHub Pages에 배포된 뒤에 동작합니다.<br>
+    지금은 GitHub 저장소에서 이 폴더를 직접 열어 보세요.
+  </p>
+  <script>
+    (function () {
+      var h = location.hostname;
+      if (h.slice(-10) === '.github.io') {
+        var user = h.split('.')[0];
+        var parts = location.pathname.split('/').filter(Boolean);
+        if (parts[parts.length - 1] === 'index.html') parts.pop();
+        var folder = parts[parts.length - 1];
+        // 프로젝트 페이지(user.github.io/repo/...)면 첫 조각이 저장소 이름
+        var repo = parts.length >= 2 ? parts[0] : user + '.github.io';
+        location.replace('https://github.com/' + user + '/' + repo + '/tree/main/' + folder);
+      } else {
+        document.getElementById('fallback').style.display = 'block';
+      }
+    })();
+  </script>
+</body>
+</html>
