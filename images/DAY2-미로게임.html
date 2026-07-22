@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <meta name="theme-color" content="#080b12">
+  <title>보물찾기 미로 — CRT 던전</title>
+  <style>
+    /* ===== 레트로 CRT 색상과 기본 레이아웃 ===== */
+    :root{--bg:#05070b;--panel:#101722;--ink:#e9f6d0;--green:#72f1a5;--cyan:#57dff4;--gold:#ffd45b;--red:#ff5d6c;--dim:#6d8290}
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html,body{margin:0;min-height:100%;background:radial-gradient(circle at 50% 10%,#172033 0,#080b12 42%,#030407 100%);color:var(--ink);font-family:"Courier New",monospace;overflow-x:hidden}
+    body{display:flex;align-items:center;justify-content:center;padding:18px;min-height:100dvh}
+    .machine{width:min(980px,100%);position:relative;background:#0c1119;border:4px solid #293646;border-radius:18px;padding:16px;box-shadow:0 0 0 5px #05070b,0 22px 80px #000,inset 0 0 34px #000}
+    .machine:before{content:"";position:absolute;inset:0;pointer-events:none;z-index:20;border-radius:14px;background:repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0 1px,transparent 1px 4px),radial-gradient(ellipse,transparent 48%,rgba(0,0,0,.5) 100%);mix-blend-mode:screen}
+    .brand{display:flex;align-items:end;justify-content:space-between;gap:12px;margin:0 3px 12px}.brand h1{margin:0;color:var(--gold);font-size:clamp(18px,4vw,30px);letter-spacing:2px;text-shadow:3px 3px #784719}.brand small{color:var(--green);font-weight:bold;animation:blink 1.2s steps(1) infinite}
+    .hud{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:10px}.stat{background:#080d14;border:2px solid #26394a;padding:7px 8px;min-width:0}.stat b{display:block;font-size:10px;color:var(--dim);letter-spacing:1px}.stat span{font-weight:bold;font-size:clamp(13px,2.7vw,18px);white-space:nowrap}.stat.time span{color:var(--gold)}
+    .screen{position:relative;background:#020506;border:3px solid #344557;border-radius:10px;padding:8px;overflow:hidden;box-shadow:inset 0 0 40px #000,0 0 18px rgba(87,223,244,.08)}
+    canvas{display:block;width:100%;height:auto;max-height:67vh;aspect-ratio:16/10;image-rendering:pixelated;background:#050910;border-radius:4px}
+    .overlay{position:absolute;inset:8px;display:flex;align-items:center;justify-content:center;text-align:center;background:rgba(2,5,6,.82);backdrop-filter:blur(2px);z-index:10}.card{width:min(520px,90%);border:3px double var(--gold);background:#091019;padding:clamp(18px,5vw,34px);box-shadow:8px 8px #000}.card h2{margin:0 0 12px;color:var(--gold);font-size:clamp(22px,6vw,38px);text-shadow:3px 3px #794519}.card p{font-size:clamp(12px,3vw,16px);line-height:1.6;color:#c9dacb}.pixel-btn{font:700 15px "Courier New",monospace;color:#091019;background:var(--green);border:0;border-bottom:5px solid #23825a;padding:12px 22px;cursor:pointer;box-shadow:4px 4px #000}.pixel-btn:active{transform:translateY(3px);border-bottom-width:2px}.hidden{display:none!important}
+    .legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:10px;color:#9aacb4;font-size:12px}.legend i{font-style:normal}.legend .g{color:var(--gold)}.legend .k{color:var(--cyan)}.legend .e{color:var(--red)}
+    .mobile-controls{display:none;grid-template-columns:repeat(3,58px);grid-template-rows:repeat(2,52px);justify-content:center;gap:6px;margin:13px auto 0}.dpad{border:2px solid #385064;background:#121e2b;color:var(--cyan);font-size:24px;font-weight:bold;border-radius:6px;box-shadow:0 4px #05070b;touch-action:none}.dpad:active,.dpad.on{background:var(--cyan);color:#071016;transform:translateY(3px);box-shadow:0 1px #05070b}.up{grid-column:2}.left{grid-column:1;grid-row:2}.down{grid-column:2;grid-row:2}.right{grid-column:3;grid-row:2}
+    .tip{text-align:center;color:#5f7482;font-size:11px;margin:10px 0 0}.toast{position:absolute;top:18px;left:50%;transform:translateX(-50%);z-index:9;color:#071016;background:var(--gold);padding:8px 13px;font-weight:bold;box-shadow:4px 4px #000;opacity:0;transition:.2s;white-space:nowrap}.toast.show{opacity:1;transform:translate(-50%,4px)}
+    @keyframes blink{50%{opacity:.35}}@media(max-width:700px),(pointer:coarse){body{padding:8px;align-items:flex-start}.machine{padding:10px;border-width:3px}.brand{align-items:center}.brand small{font-size:9px}.hud{grid-template-columns:repeat(5,1fr);gap:4px}.stat{padding:5px 3px;text-align:center}.stat b{font-size:8px}.screen{padding:4px}.overlay{inset:4px}.mobile-controls{display:grid}.legend{justify-content:center;font-size:10px}.tip{display:none}}
+    @media(max-height:650px) and (orientation:landscape){body{padding:5px}.machine{display:grid;grid-template-columns:1fr 170px;gap:8px}.brand,.hud,.legend,.tip{grid-column:1}.screen{grid-column:1;grid-row:3/7}.mobile-controls{grid-column:2;grid-row:3;align-self:center}.mobile-controls{grid-template-columns:repeat(3,46px);grid-template-rows:repeat(2,46px)}canvas{max-height:76vh}}
+  </style>
+</head>
+<body>
+<main class="machine" aria-label="보물찾기 미로 게임">
+  <header class="brand"><h1>◆ TREASURE//MAZE</h1><small>CRT-86 ONLINE</small></header>
+  <section class="hud" aria-label="게임 정보">
+    <div class="stat"><b>SCORE</b><span id="score">00000</span></div>
+    <div class="stat"><b>LEVEL</b><span id="level">01</span></div>
+    <div class="stat time"><b>TIME</b><span id="time">01:00</span></div>
+    <div class="stat"><b>TREASURE</b><span id="treasure">0/0</span></div>
+    <div class="stat"><b>KEY</b><span id="key">NO</span></div>
+  </section>
+  <section class="screen">
+    <canvas id="game" width="800" height="500" aria-label="게임 화면"></canvas>
+    <div class="toast" id="toast" role="status"></div>
+    <div class="overlay" id="overlay">
+      <div class="card"><h2 id="title">TREASURE MAZE</h2><p id="message">미로 속 보물을 모두 모으고<br>열쇠로 출구를 열어 탈출하세요.<br><br>적에게 잡히면 시간과 점수를 잃습니다.</p><button class="pixel-btn" id="start">GAME START</button></div>
+    </div>
+  </section>
+  <div class="legend"><i class="g">◆ 보물</i><i class="k">♦ 열쇠</i><i>▣ 잠긴 문</i><i class="e">▲ 적</i><i style="color:#72f1a5">● 탐험가</i></div>
+  <div class="mobile-controls" aria-label="모바일 방향키">
+    <button class="dpad up" data-dir="up" aria-label="위">▲</button><button class="dpad left" data-dir="left" aria-label="왼쪽">◀</button><button class="dpad down" data-dir="down" aria-label="아래">▼</button><button class="dpad right" data-dir="right" aria-label="오른쪽">▶</button>
+  </div>
+  <p class="tip">이동: 방향키 / WASD · 일시정지: P · 다시 시작: R</p>
+</main>
+<script>
+/*
+ * TREASURE MAZE — 외부 라이브러리 없는 단일 HTML 게임
+ * 미로 생성: 재귀 백트래킹 / 렌더링: Canvas 2D / 저장: localStorage
+ */
+(() => {
+  'use strict';
+  const canvas=document.getElementById('game'),ctx=canvas.getContext('2d');
+  const $=id=>document.getElementById(id);
+  const ui={score:$('score'),level:$('level'),time:$('time'),treasure:$('treasure'),key:$('key'),overlay:$('overlay'),title:$('title'),message:$('message'),start:$('start'),toast:$('toast')};
+  const S={cols:21,rows:13,maze:[],level:1,score:0,time:60,running:false,paused:false,player:null,key:null,door:null,treasures:[],enemies:[],last:0,tick:0,hitLock:0};
+  const DIR={up:[0,-1],down:[0,1],left:[-1,0],right:[1,0]};
+
+  // 홀수 좌표를 방으로 사용하고 두 칸씩 길을 파 랜덤 미로를 만든다.
+  function generateMaze(cols,rows){
+    cols=cols%2?cols:cols-1;rows=rows%2?rows:rows-1;
+    const m=Array.from({length:rows},()=>Array(cols).fill(1));
+    const stack=[[1,1]];m[1][1]=0;
+    while(stack.length){
+      const [x,y]=stack[stack.length-1];
+      const opts=[[2,0],[-2,0],[0,2],[0,-2]].filter(([dx,dy])=>{const nx=x+dx,ny=y+dy;return nx>0&&ny>0&&nx<cols-1&&ny<rows-1&&m[ny][nx]===1});
+      if(!opts.length){stack.pop();continue}
+      const [dx,dy]=opts[Math.floor(Math.random()*opts.length)];m[y+dy/2][x+dx/2]=0;m[y+dy][x+dx]=0;stack.push([x+dx,y+dy]);
+    }
+    // 약간의 지름길을 뚫어 추격전이 답답하지 않게 한다.
+    for(let i=0;i<Math.floor(cols*rows*.025);i++){const x=2+Math.floor(Math.random()*(cols-4)),y=2+Math.floor(Math.random()*(rows-4));if((x+y)%2===1)m[y][x]=0}
+    return m;
+  }
+  const same=(a,b)=>a&&b&&a.x===b.x&&a.y===b.y;
+  const floorCells=()=>{const a=[];for(let y=1;y<S.rows-1;y++)for(let x=1;x<S.cols-1;x++)if(S.maze[y][x]===0)a.push({x,y});return a};
+  function farthest(from,excluded=[]){let best=null,dist=-1;for(const p of floorCells()){if(excluded.some(e=>same(e,p)))continue;const d=Math.abs(p.x-from.x)+Math.abs(p.y-from.y);if(d>dist){best=p;dist=d}}return best}
+  function randomFree(excluded=[],minDist=0){const cells=floorCells().filter(p=>!excluded.some(e=>same(e,p))&&Math.abs(p.x-S.player.x)+Math.abs(p.y-S.player.y)>=minDist);return {...cells[Math.floor(Math.random()*cells.length)]}}
+
+  // 레벨마다 보물과 적 수, 제한시간을 조정한다.
+  function makeLevel(resetScore=false){
+    if(resetScore){S.score=0;S.level=1}
+    S.maze=generateMaze(S.cols,S.rows);S.player={x:1,y:1};S.door=farthest(S.player);S.key=randomFree([S.player,S.door],8);
+    const used=[S.player,S.door,S.key];S.treasures=[];
+    const count=Math.min(3+S.level,8);for(let i=0;i<count;i++){const p=randomFree(used,4);used.push(p);S.treasures.push({...p,got:false})}
+    S.enemies=[];const enemyCount=Math.min(1+Math.floor(S.level/2),5);for(let i=0;i<enemyCount;i++){const p=randomFree(used,10);used.push(p);S.enemies.push({...p,moveAt:0,stun:0})}
+    S.hasKey=false;S.time=Math.max(38,66-S.level*3);S.running=true;S.paused=false;S.hitLock=0;S.last=performance.now();updateHUD();showToast(`LEVEL ${S.level} — 보물 ${count}개!`);requestAnimationFrame(loop);
+  }
+  function walkable(x,y){return y>=0&&x>=0&&y<S.rows&&x<S.cols&&S.maze[y][x]===0}
+  function move(dir){
+    if(!S.running||S.paused)return;const [dx,dy]=DIR[dir],nx=S.player.x+dx,ny=S.player.y+dy;if(!walkable(nx,ny))return;
+    S.player.x=nx;S.player.y=ny;
+    // 아이템 충돌 판정
+    const t=S.treasures.find(v=>!v.got&&same(v,S.player));if(t){t.got=true;S.score+=100+S.level*15;showToast('◆ 보물 발견! +'+(100+S.level*15))}
+    if(S.key&&!S.hasKey&&same(S.key,S.player)){S.hasKey=true;S.score+=200;showToast('♦ 열쇠 획득! 출구로!')}
+    if(same(S.door,S.player)){
+      if(!S.hasKey)showToast('▣ 문이 잠겨 있다 — 열쇠 필요!');
+      else if(S.treasures.some(v=>!v.got))showToast('◆ 아직 남은 보물이 있다!');
+      else{S.score+=500+Math.ceil(S.time)*10;S.running=false;S.level++;setTimeout(()=>makeLevel(false),700);showToast('탈출 성공! NEXT LEVEL')}
+    }
+    checkEnemyHit();updateHUD();draw();
+  }
+
+  // BFS로 플레이어까지의 최단 경로를 찾아 적의 다음 한 칸을 결정한다.
+  function enemyStep(e){
+    const q=[[e.x,e.y]],seen=new Set([e.x+','+e.y]),parent=new Map();let target=null;
+    while(q.length){const [x,y]=q.shift();if(x===S.player.x&&y===S.player.y){target=[x,y];break}for(const [dx,dy] of Object.values(DIR)){const nx=x+dx,ny=y+dy,k=nx+','+ny;if(walkable(nx,ny)&&!seen.has(k)){seen.add(k);parent.set(k,[x,y]);q.push([nx,ny])}}}
+    if(!target)return;let cur=target,prev=target;while(parent.has(cur[0]+','+cur[1])){prev=cur;cur=parent.get(cur[0]+','+cur[1]);if(cur[0]===e.x&&cur[1]===e.y){e.x=prev[0];e.y=prev[1];break}}
+  }
+  function checkEnemyHit(){
+    if(S.hitLock>0)return;const hit=S.enemies.some(e=>same(e,S.player));if(hit){S.score=Math.max(0,S.score-150);S.time=Math.max(1,S.time-8);S.player={x:1,y:1};S.hitLock=1.2;showToast('적에게 잡혔다! -150 / -8초')}
+  }
+  function update(dt){
+    S.time-=dt;S.hitLock=Math.max(0,S.hitLock-dt);S.tick+=dt;
+    const speed=Math.max(.22,.46-S.level*.025);for(const e of S.enemies)if(S.tick>=e.moveAt){enemyStep(e);e.moveAt=S.tick+speed+Math.random()*.16}
+    checkEnemyHit();if(S.time<=0){S.time=0;endGame()}updateHUD();
+  }
+  function endGame(){S.running=false;const best=Math.max(Number(localStorage.getItem('mazeBest')||0),S.score);localStorage.setItem('mazeBest',best);ui.title.textContent='TIME OVER';ui.message.innerHTML=`최종 점수 <b style="color:#ffd45b">${S.score}</b><br>도달 레벨 ${S.level}<br>최고 점수 ${best}`;ui.start.textContent='RETRY';ui.overlay.classList.remove('hidden')}
+  function updateHUD(){ui.score.textContent=String(S.score).padStart(5,'0');ui.level.textContent=String(S.level).padStart(2,'0');const sec=Math.max(0,Math.ceil(S.time));ui.time.textContent=`${String(Math.floor(sec/60)).padStart(2,'0')}:${String(sec%60).padStart(2,'0')}`;ui.treasure.textContent=`${S.treasures.filter(t=>t.got).length}/${S.treasures.length}`;ui.key.textContent=S.hasKey?'YES':'NO';ui.key.style.color=S.hasKey?'#57dff4':''}
+
+  // 캔버스 크기에 맞춰 픽셀 타일을 선명하게 그린다.
+  function draw(){
+    const W=canvas.width,H=canvas.height,t=Math.floor(Math.min(W/S.cols,H/S.rows)),ox=Math.floor((W-t*S.cols)/2),oy=Math.floor((H-t*S.rows)/2);ctx.fillStyle='#03070b';ctx.fillRect(0,0,W,H);
+    for(let y=0;y<S.rows;y++)for(let x=0;x<S.cols;x++){const px=ox+x*t,py=oy+y*t;if(S.maze[y][x]){ctx.fillStyle=(x+y)%2?'#182838':'#142332';ctx.fillRect(px,py,t,t);ctx.fillStyle='#263e51';ctx.fillRect(px,py,t,3);ctx.fillStyle='#0a111b';ctx.fillRect(px+t-3,py,3,t)}else{ctx.fillStyle=(x+y)%2?'#09131a':'#0b161e';ctx.fillRect(px,py,t,t);ctx.fillStyle='rgba(87,223,244,.035)';ctx.fillRect(px+3,py+3,2,2)}}
+    const box=(p,color,label)=>{const x=ox+p.x*t,y=oy+p.y*t;ctx.fillStyle=color;ctx.fillRect(x+t*.24,y+t*.24,t*.52,t*.52);ctx.fillStyle='#fff';ctx.font=`bold ${Math.max(10,t*.42)}px monospace`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(label,x+t/2,y+t/2)};
+    box(S.door,S.hasKey?'#72f1a5':'#7b5262','▣');if(!S.hasKey)box(S.key,'#57dff4','♦');S.treasures.filter(v=>!v.got).forEach(v=>box(v,'#e3a928','◆'));
+    S.enemies.forEach((e,i)=>{const x=ox+e.x*t,y=oy+e.y*t;ctx.fillStyle=i%2?'#ff7d5d':'#ff4f68';ctx.beginPath();ctx.moveTo(x+t/2,y+t*.16);ctx.lineTo(x+t*.84,y+t*.82);ctx.lineTo(x+t*.16,y+t*.82);ctx.fill();ctx.fillStyle='#fff';ctx.fillRect(x+t*.4,y+t*.46,3,3);ctx.fillRect(x+t*.58,y+t*.46,3,3)});
+    const p=S.player,x=ox+p.x*t,y=oy+p.y*t;ctx.globalAlpha=S.hitLock>0&&Math.floor(S.tick*12)%2?0.25:1;ctx.fillStyle='#72f1a5';ctx.fillRect(x+t*.23,y+t*.18,t*.54,t*.64);ctx.fillStyle='#dffff0';ctx.fillRect(x+t*.34,y+t*.3,3,3);ctx.fillRect(x+t*.58,y+t*.3,3,3);ctx.globalAlpha=1;
+    if(S.paused){ctx.fillStyle='rgba(0,0,0,.7)';ctx.fillRect(0,0,W,H);ctx.fillStyle='#ffd45b';ctx.font='bold 38px monospace';ctx.textAlign='center';ctx.fillText('PAUSED',W/2,H/2)}
+  }
+  function loop(now){if(!S.running)return;const dt=Math.min(.05,(now-S.last)/1000);S.last=now;if(!S.paused)update(dt);draw();requestAnimationFrame(loop)}
+  let toastTimer;function showToast(msg){ui.toast.textContent=msg;ui.toast.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>ui.toast.classList.remove('show'),1300)}
+  function start(){ui.overlay.classList.add('hidden');makeLevel(true)}
+  ui.start.addEventListener('click',start);
+  addEventListener('keydown',e=>{const key={ArrowUp:'up',w:'up',W:'up',ArrowDown:'down',s:'down',S:'down',ArrowLeft:'left',a:'left',A:'left',ArrowRight:'right',d:'right',D:'right'}[e.key];if(key){e.preventDefault();move(key)}if(e.key==='p'||e.key==='P'){S.paused=!S.paused;S.last=performance.now();draw()}if((e.key==='r'||e.key==='R')&&S.running)makeLevel(true)});
+  // 터치 시 한 칸 이동하고, 누르고 있으면 일정 간격으로 연속 이동한다.
+  document.querySelectorAll('.dpad').forEach(btn=>{let timer;const go=e=>{e.preventDefault();btn.classList.add('on');move(btn.dataset.dir);timer=setInterval(()=>move(btn.dataset.dir),145)};const stop=()=>{btn.classList.remove('on');clearInterval(timer)};btn.addEventListener('pointerdown',go);btn.addEventListener('pointerup',stop);btn.addEventListener('pointercancel',stop);btn.addEventListener('pointerleave',stop)});
+  draw();
+})();
+</script>
+</body>
+</html>
