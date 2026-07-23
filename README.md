@@ -5,43 +5,23 @@
 하나씩 배우며 만들어 가는 기록장.
 배운 내용을 정리하고, 실습한 결과를 기록하며 AI와 함께 성장해 나가는 공간입니다.
 
+작품으로 올린 모든 작품은 교육용 가상 브랜드이며 실제 판매가 아님을 알려드립니다.
+
 ---
+## 🎀 자기 소개
+본명 아님 닉네임 :
+나이 :
+잘하는것 :
+자랑할 만한 일 :
 
-## 🚀 시작하기 — 내 타임캡슐 만들기 
 
-**가장 쉬운 방법 (추천!)** — 버튼 한 번으로 이 구조를 통째로 복사:
-
-1. GitHub 로그인 → 이 페이지 오른쪽 위 초록색 **Use this template** 버튼 → **Create a new repository**
-2. Repository name: `my-portfolio`
-3. **Public** 선택 → **Create repository** 클릭
-4. 끝! 폴더 5개와 안내 파일이 전부 복사된 내 타임캡슐 완성 🎉
-
-<details>
-<summary>수동으로 만들고 싶다면 (클릭해서 펼치기)</summary>
-
-1. 우측 상단 `+` → **New repository** → 이름 `my-portfolio` → **Public** + **Add a README file** 체크 → Create
-2. 폴더 만드는 법: `Add file` → `Create new file` → 파일 이름 칸에 `day1-me/README.md` 처럼 입력하면 폴더가 자동으로 생깁니다
-3. 이 예시 저장소와 똑같이 폴더 5개를 만들면 준비 끝!
-
-</details>
 
 ---
 
-## 📮 출석부 & 인증 — Issues에 댓글 남기기
-
-원본 저장소([gumi_portfolio](https://github.com/sinnarasam/gumi_portfolio))의 **Issues** 메뉴가 우리 반 출석부입니다!
-
-| 언제 | 어디에 | 무엇을 |
-|------|--------|--------|
-| Day 1 — 내 저장소 만든 직후 | [#1 등록 이슈](https://github.com/sinnarasam/gumi_portfolio/issues/1) | 내 저장소 주소를 댓글로 등록 |
-| 매일 마지막 교시 — 커밋 완료 후 | 그날의 커밋 인증 이슈 ([#2](https://github.com/sinnarasam/gumi_portfolio/issues/2)~[#6](https://github.com/sinnarasam/gumi_portfolio/issues/6)) | 오늘 봉인한 것 + 저장소 링크 + 한 줄 소감 |
-
-댓글 양식은 각 이슈 본문에 있어요. **복사해서 채우면 끝!**
 
 ---
 
-## 📂 폴더 안내 — 어디에 무엇을 올리나요?
-
+## 📂 나의 작품 갤러리
 | 폴더 | 올리는 날 | 들어갈 산출물 |
 |------|-----------|---------------|
 | [`day1-me/`](day1-me/) | Day 1 | 나 사용설명서 포스터 · 미래 명함 · AI 비서 키트 |
