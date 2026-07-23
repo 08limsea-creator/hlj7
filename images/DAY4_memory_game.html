@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>반짝 메모리 게임</title>
+  <style>
+    :root {
+      --bg1: #ffdff0;
+      --bg2: #dff2ff;
+      --bg3: #e9e0ff;
+      --bg4: #fff4c9;
+      --panel: rgba(255,255,255,.62);
+      --text: #35324a;
+      --accent: #7c6cff;
+      --accent2: #ff7eb6;
+      --good: #43c59e;
+      --shadow: 0 18px 50px rgba(82, 73, 120, .16);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Pretendard", "Noto Sans KR", system-ui, sans-serif;
+      color: var(--text);
+      background: linear-gradient(135deg, var(--bg1), var(--bg2), var(--bg3), var(--bg4));
+      background-size: 300% 300%;
+      animation: pastelFlow 18s ease infinite;
+      overflow-x: hidden;
+      position: relative;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+
+    .app {
+      width: min(980px, 100%);
+      background: var(--panel);
+      border: 1px solid rgba(255,255,255,.85);
+      backdrop-filter: blur(22px) saturate(125%);
+      -webkit-backdrop-filter: blur(22px) saturate(125%);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      padding: 24px;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    h1 { margin: 0; font-size: clamp(1.6rem, 4vw, 2.5rem); }
+    .subtitle { margin: 6px 0 0; opacity: .72; }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    select, button {
+      border: 0;
+      border-radius: 14px;
+      padding: 11px 14px;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    select { background: white; color: var(--text); }
+    button {
+      color: white;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      box-shadow: 0 10px 24px rgba(124,108,255,.25);
+      font-weight: 700;
+    }
+    button:active { transform: translateY(1px); }
+    #soundBtn {
+      min-width: 112px;
+      background: rgba(255,255,255,.9);
+      color: var(--text);
+      box-shadow: 0 8px 20px rgba(82,73,120,.12);
+    }
+    #soundBtn[aria-pressed="false"] { opacity: .72; }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0,1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .stat {
+      background: rgba(255,255,255,.82);
+      border-radius: 18px;
+      padding: 14px;
+      text-align: center;
+    }
+    .stat strong { display: block; font-size: 1.35rem; margin-top: 4px; }
+    .stat span { font-size: .84rem; opacity: .65; }
+
+    .game-board {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(var(--cols), minmax(64px, 1fr));
+      perspective: 1200px;
+    }
+
+    .card {
+      position: relative;
+      aspect-ratio: 1 / 1;
+      border: 0;
+      padding: 0;
+      background: transparent;
+      box-shadow: none;
+      transform-style: preserve-3d;
+      transition: transform .45s ease;
+      border-radius: 18px;
+    }
+    .card.flipped, .card.matched { transform: rotateY(180deg); }
+    .card.clicked .face { animation: cardTap .28s cubic-bezier(.2,.8,.2,1); }
+    .card.matched .back { animation: matchGlow .6s ease; }
+    .card.wrong { animation: wrongShake .38s ease; }
+
+    .face {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      backface-visibility: hidden;
+      border-radius: 18px;
+      user-select: none;
+    }
+
+    .front {
+      background: linear-gradient(145deg, #8e7dff, #ff8fbd);
+      color: white;
+      font-size: clamp(1.4rem, 4vw, 2rem);
+      box-shadow: 0 9px 22px rgba(82,73,120,.18);
+    }
+    .front::after { content: "?"; font-weight: 900; }
+
+    .back {
+      background: white;
+      transform: rotateY(180deg);
+      font-size: clamp(1.8rem, 5vw, 3.2rem);
+      box-shadow: inset 0 0 0 3px rgba(124,108,255,.1), 0 9px 22px rgba(82,73,120,.14);
+    }
+
+    .progress-wrap {
+      margin-top: 18px;
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(53,50,74,.1);
+      overflow: hidden;
+    }
+    .progress {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(90deg, var(--good), #ffd166, #ff6b6b);
+      transform-origin: left;
+      transition: width 1s linear;
+    }
+
+    .message {
+      min-height: 28px;
+      margin-top: 14px;
+      text-align: center;
+      font-weight: 700;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: none;
+      place-items: center;
+      background: rgba(35,30,58,.38);
+      backdrop-filter: blur(7px);
+      -webkit-backdrop-filter: blur(7px);
+      padding: 24px;
+    }
+    .modal.show { display: grid; animation: modalFade .28s ease both; }
+    .modal-card {
+      width: min(420px,100%);
+      background: white;
+      border-radius: 24px;
+      padding: 28px;
+      text-align: center;
+      box-shadow: var(--shadow);
+      animation: modalPop .38s cubic-bezier(.2,.9,.25,1.15) both;
+    }
+    .modal-card h2 { margin-top: 0; }
+    .modal-card p { line-height: 1.65; color: #67627d; }
+    #againBtn {
+      min-width: 180px;
+      margin-top: 10px;
+      padding: 14px 22px;
+      font-size: 1.05rem;
+      animation: startPulse 1.8s ease-in-out infinite;
+    }
+
+
+
+    .decorations {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 0;
+    }
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(4px);
+      opacity: .5;
+      animation: floatBlob 9s ease-in-out infinite;
+    }
+    .blob.one { width: 220px; height: 220px; left: -60px; top: 10%; background: rgba(255,255,255,.7); }
+    .blob.two { width: 170px; height: 170px; right: -40px; top: 18%; background: rgba(255,210,235,.72); animation-delay: -3s; }
+    .blob.three { width: 260px; height: 260px; left: 18%; bottom: -120px; background: rgba(213,235,255,.7); animation-delay: -6s; }
+    .sparkle {
+      position: absolute;
+      font-size: clamp(16px, 2vw, 26px);
+      opacity: .55;
+      animation: twinkle 3.2s ease-in-out infinite;
+    }
+    .sparkle.s1 { left: 8%; top: 20%; }
+    .sparkle.s2 { right: 12%; top: 35%; animation-delay: -1.4s; }
+    .sparkle.s3 { left: 14%; bottom: 18%; animation-delay: -.7s; }
+    .sparkle.s4 { right: 18%; bottom: 12%; animation-delay: -2.1s; }
+
+    body > .app { position: relative; z-index: 1; }
+
+    @keyframes modalFade {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes modalPop {
+      from { opacity: 0; transform: translateY(18px) scale(.92); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    @keyframes startPulse {
+      0%,100% { transform: translateY(0) scale(1); box-shadow: 0 10px 24px rgba(124,108,255,.25); }
+      50% { transform: translateY(-2px) scale(1.035); box-shadow: 0 14px 32px rgba(255,126,182,.38); }
+    }
+
+    @keyframes pastelFlow {
+      0%,100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+    @keyframes floatBlob {
+      0%,100% { transform: translate3d(0,0,0) scale(1); }
+      50% { transform: translate3d(18px,-24px,0) scale(1.08); }
+    }
+    @keyframes twinkle {
+      0%,100% { transform: scale(.8) rotate(0deg); opacity: .3; }
+      50% { transform: scale(1.25) rotate(12deg); opacity: .8; }
+    }
+
+    @keyframes cardTap {
+      0% { scale: 1; }
+      45% { scale: .9; filter: brightness(1.12); }
+      100% { scale: 1; }
+    }
+
+    @keyframes matchGlow {
+      0%, 100% { scale: 1; box-shadow: inset 0 0 0 3px rgba(124,108,255,.1), 0 9px 22px rgba(82,73,120,.14); }
+      45% { scale: 1.09; box-shadow: inset 0 0 0 4px rgba(67,197,158,.55), 0 0 28px rgba(67,197,158,.6); }
+    }
+
+    @keyframes wrongShake {
+      0%, 100% { translate: 0 0; }
+      25% { translate: -7px 0; }
+      50% { translate: 7px 0; }
+      75% { translate: -4px 0; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .card, .face, .progress, body, .blob, .sparkle { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+    }
+
+    @media (max-width: 680px) {
+      body { padding: 12px; }
+      .app { padding: 16px; border-radius: 22px; }
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .game-board { gap: 9px; }
+      .face { border-radius: 14px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="decorations" aria-hidden="true">
+    <span class="blob one"></span>
+    <span class="blob two"></span>
+    <span class="blob three"></span>
+    <span class="sparkle s1">✦</span>
+    <span class="sparkle s2">✧</span>
+    <span class="sparkle s3">✦</span>
+    <span class="sparkle s4">✧</span>
+  </div>
+  <main class="app">
+    <header>
+      <div>
+        <h1>✨ 반짝 메모리 게임</h1>
+        <p class="subtitle">같은 그림 두 장을 찾아보세요.</p>
+      </div>
+      <div class="controls">
+        <select id="difficulty" aria-label="난이도 선택">
+          <option value="easy">쉬움 4×3</option>
+          <option value="normal" selected>보통 4×4</option>
+          <option value="hard">어려움 6×4</option>
+        </select>
+        <button id="soundBtn" type="button" aria-pressed="true">🔊 소리 ON</button>
+        <button id="startBtn">새 게임</button>
+      </div>
+    </header>
+
+    <section class="stats">
+      <div class="stat"><span>점수</span><strong id="score">0</strong></div>
+      <div class="stat"><span>시도</span><strong id="moves">0</strong></div>
+      <div class="stat"><span>남은 시간</span><strong id="time">60</strong></div>
+      <div class="stat"><span>최고 점수</span><strong id="best">0</strong></div>
+    </section>
+
+    <section id="board" class="game-board" aria-label="메모리 카드 게임판"></section>
+    <div class="progress-wrap"><div id="progress" class="progress"></div></div>
+    <div id="message" class="message">새 게임을 눌러 시작하세요.</div>
+  </main>
+
+  <div id="modal" class="modal show" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div id="modalIcon" style="font-size:3rem; margin-bottom:8px;">🧠</div>
+      <h2 id="resultTitle">메모리 게임</h2>
+      <p id="resultText">카드 위치를 기억하고 같은 그림 두 장을 찾아보세요!</p>
+      <button id="againBtn">게임 시작</button>
+    </div>
+  </div>
+
+  <script>
+    const EMOJIS = ['🍓','🐰','🌙','⭐','🍀','🎀','🧸','🍰','🐣','🌈','🍒','🦋'];
+    const SETTINGS = {
+      easy: { pairs: 6, cols: 4, time: 50 },
+      normal: { pairs: 8, cols: 4, time: 70 },
+      hard: { pairs: 12, cols: 6, time: 100 }
+    };
+
+    const board = document.getElementById('board');
+    const scoreEl = document.getElementById('score');
+    const movesEl = document.getElementById('moves');
+    const timeEl = document.getElementById('time');
+    const bestEl = document.getElementById('best');
+    const messageEl = document.getElementById('message');
+    const progressEl = document.getElementById('progress');
+    const difficultyEl = document.getElementById('difficulty');
+    const modal = document.getElementById('modal');
+    const resultTitle = document.getElementById('resultTitle');
+    const resultText = document.getElementById('resultText');
+    const modalIcon = document.getElementById('modalIcon');
+    const againBtn = document.getElementById('againBtn');
+    const soundBtn = document.getElementById('soundBtn');
+
+    let firstCard = null;
+    let secondCard = null;
+    let lockBoard = true;
+    let matchedPairs = 0;
+    let score = 0;
+    let moves = 0;
+    let timeLeft = 0;
+    let totalTime = 0;
+    let timer = null;
+    let gameToken = 0;
+
+
+
+    // 외부 음원 없이 Web Audio API로 만드는 효과음과 간단한 BGM
+    let audioCtx = null;
+    let soundOn = localStorage.getItem('memoryGameSound') !== 'off';
+    let bgmTimer = null;
+    let bgmStep = 0;
+
+    function ensureAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+    }
+
+    function tone(freq, duration = .1, type = 'sine', volume = .055, delay = 0) {
+      if (!soundOn) return;
+      ensureAudio();
+      const now = audioCtx.currentTime + delay;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, now);
+      gain.gain.setValueAtTime(.0001, now);
+      gain.gain.exponentialRampToValueAtTime(volume, now + .012);
+      gain.gain.exponentialRampToValueAtTime(.0001, now + duration);
+      osc.connect(gain).connect(audioCtx.destination);
+      osc.start(now);
+      osc.stop(now + duration + .03);
+    }
+
+    function playSound(name) {
+      if (!soundOn) return;
+      const sounds = {
+        start() { [392, 523, 659].forEach((f, i) => tone(f, .16, 'sine', .055, i * .09)); },
+        flip() { tone(540, .055, 'triangle', .035); tone(720, .045, 'triangle', .025, .035); },
+        match() { [660, 830, 990].forEach((f, i) => tone(f, .18, 'sine', .06, i * .07)); },
+        wrong() { tone(210, .13, 'square', .025); tone(165, .18, 'square', .02, .1); },
+        win() { [523, 659, 784, 1047].forEach((f, i) => tone(f, .28, 'triangle', .065, i * .12)); },
+        timeout() { [330, 262, 196].forEach((f, i) => tone(f, .28, 'sine', .05, i * .16)); }
+      };
+      sounds[name]?.();
+    }
+
+    function startBgm() {
+      stopBgm();
+      if (!soundOn) return;
+      ensureAudio();
+      const melody = [523, 659, 587, 784, 659, 587, 523, 392];
+      bgmStep = 0;
+      const tick = () => {
+        if (!soundOn || lockBoard && modal.classList.contains('show')) return;
+        tone(melody[bgmStep % melody.length], .22, 'sine', .012);
+        if (bgmStep % 2 === 0) tone(melody[bgmStep % melody.length] / 2, .34, 'triangle', .008);
+        bgmStep++;
+      };
+      tick();
+      bgmTimer = setInterval(tick, 430);
+    }
+
+    function stopBgm() {
+      clearInterval(bgmTimer);
+      bgmTimer = null;
+    }
+
+    function updateSoundButton() {
+      soundBtn.textContent = soundOn ? '🔊 소리 ON' : '🔇 소리 OFF';
+      soundBtn.setAttribute('aria-pressed', String(soundOn));
+    }
+
+    soundBtn.addEventListener('click', () => {
+      soundOn = !soundOn;
+      localStorage.setItem('memoryGameSound', soundOn ? 'on' : 'off');
+      updateSoundButton();
+      if (soundOn) {
+        playSound('start');
+        if (!modal.classList.contains('show')) startBgm();
+      } else {
+        stopBgm();
+      }
+    });
+
+    const bestKey = 'memoryGameBestScore';
+    bestEl.textContent = localStorage.getItem(bestKey) || 0;
+
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    function showStartScreen() {
+      clearInterval(timer);
+      stopBgm();
+      gameToken++;
+      lockBoard = true;
+      modalIcon.textContent = '🧠';
+      resultTitle.textContent = '메모리 게임';
+      resultText.textContent = '처음에는 모든 카드가 공개됩니다. 위치를 기억한 뒤 같은 그림 두 장을 찾아보세요!';
+      againBtn.textContent = '게임 시작';
+      modal.classList.add('show');
+      messageEl.textContent = '게임 시작 버튼을 눌러주세요.';
+    }
+
+    function startGame() {
+      clearInterval(timer);
+      const currentToken = ++gameToken;
+      modal.classList.remove('show');
+      playSound('start');
+
+      const level = SETTINGS[difficultyEl.value];
+      totalTime = level.time;
+      timeLeft = totalTime;
+      score = 0;
+      moves = 0;
+      matchedPairs = 0;
+      firstCard = null;
+      secondCard = null;
+      lockBoard = true;
+
+      scoreEl.textContent = score;
+      movesEl.textContent = moves;
+      timeEl.textContent = timeLeft;
+      progressEl.style.width = '100%';
+      messageEl.textContent = '카드 위치를 기억하세요! 👀';
+      board.style.setProperty('--cols', level.cols);
+      board.innerHTML = '';
+
+      const icons = EMOJIS.slice(0, level.pairs);
+      const deck = shuffle([...icons, ...icons].map((icon, index) => ({ icon, id: index })));
+
+      deck.forEach(({ icon }) => {
+        const card = document.createElement('button');
+        card.className = 'card flipped';
+        card.type = 'button';
+        card.dataset.icon = icon;
+        card.setAttribute('aria-label', `카드 ${icon}`);
+        card.innerHTML = `
+          <span class="face front"></span>
+          <span class="face back">${icon}</span>
+        `;
+        card.addEventListener('click', () => flipCard(card));
+        board.appendChild(card);
+      });
+
+      setTimeout(() => {
+        if (currentToken !== gameToken) return;
+        const cards = [...board.querySelectorAll('.card')];
+        messageEl.textContent = '이제 카드가 뒤집힙니다!';
+
+        cards.forEach((card, index) => {
+          setTimeout(() => {
+            if (currentToken !== gameToken) return;
+            card.classList.remove('flipped');
+            card.setAttribute('aria-label', '뒤집힌 카드');
+          }, index * 45);
+        });
+
+        const closeDelay = cards.length * 45 + 500;
+        setTimeout(() => {
+          if (currentToken !== gameToken) return;
+          lockBoard = false;
+          messageEl.textContent = '게임 시작! 같은 그림 두 장을 찾아보세요 ✨';
+          startBgm();
+
+          timer = setInterval(() => {
+            timeLeft--;
+            timeEl.textContent = timeLeft;
+            progressEl.style.width = `${(timeLeft / totalTime) * 100}%`;
+            if (timeLeft <= 0) endGame(false);
+          }, 1000);
+        }, closeDelay);
+      }, 2500);
+    }
+
+    function flipCard(card) {
+      if (lockBoard || card === firstCard || card.classList.contains('matched')) return;
+
+      playSound('flip');
+      card.classList.remove('clicked');
+      void card.offsetWidth;
+      card.classList.add('clicked', 'flipped');
+      card.addEventListener('animationend', () => card.classList.remove('clicked'), { once: true });
+      card.setAttribute('aria-label', `카드 ${card.dataset.icon}`);
+
+      if (!firstCard) {
+        firstCard = card;
+        return;
+      }
+
+      secondCard = card;
+      moves++;
+      movesEl.textContent = moves;
+      checkMatch();
+    }
+
+    function checkMatch() {
+      const isMatch = firstCard.dataset.icon === secondCard.dataset.icon;
+      if (isMatch) {
+        firstCard.classList.add('matched');
+        secondCard.classList.add('matched');
+        matchedPairs++;
+        score += Math.max(80, 150 - moves * 2) + timeLeft;
+        scoreEl.textContent = score;
+        playSound('match');
+        messageEl.textContent = '정답! 아주 좋아요 🎉';
+        resetTurn();
+
+        const level = SETTINGS[difficultyEl.value];
+        if (matchedPairs === level.pairs) endGame(true);
+      } else {
+        lockBoard = true;
+        playSound('wrong');
+        firstCard.classList.add('wrong');
+        secondCard.classList.add('wrong');
+        messageEl.textContent = '다른 카드예요. 다시 기억해보세요!';
+        setTimeout(() => {
+          firstCard.classList.remove('flipped', 'wrong');
+          secondCard.classList.remove('flipped', 'wrong');
+          firstCard.setAttribute('aria-label', '뒤집힌 카드');
+          secondCard.setAttribute('aria-label', '뒤집힌 카드');
+          resetTurn();
+        }, 750);
+      }
+    }
+
+    function resetTurn() {
+      [firstCard, secondCard] = [null, null];
+      lockBoard = false;
+    }
+
+    function endGame(won) {
+      clearInterval(timer);
+      stopBgm();
+      lockBoard = true;
+
+      if (won) {
+        playSound('win');
+        const currentBest = Number(localStorage.getItem(bestKey) || 0);
+        if (score > currentBest) {
+          localStorage.setItem(bestKey, score);
+          bestEl.textContent = score;
+        }
+        modalIcon.textContent = '🏆';
+        resultTitle.textContent = '게임이 끝났어요!';
+        resultText.textContent = `축하해요! 모든 카드를 맞췄어요. 점수 ${score}점 · ${moves}번 시도 · ${timeLeft}초 남음`;
+        againBtn.textContent = '다시 시작';
+        messageEl.textContent = '모든 짝을 찾았습니다!';
+      } else {
+        playSound('timeout');
+        modalIcon.textContent = '⏰';
+        resultTitle.textContent = '게임이 끝났어요!';
+        resultText.textContent = `시간이 종료됐어요. 찾은 짝 ${matchedPairs}개 · 점수 ${score}점`;
+        againBtn.textContent = '다시 도전';
+        messageEl.textContent = '시간이 끝났어요. 다시 도전해보세요!';
+      }
+      modal.classList.add('show');
+    }
+
+    document.getElementById('startBtn').addEventListener('click', showStartScreen);
+    againBtn.addEventListener('click', startGame);
+
+    updateSoundButton();
+    showStartScreen();
+  </script>
+</body>
+</html>
