@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎭 버추얼 캐릭터 IP 데뷔시키기 — Day 3 프롬프트 활동지</title>
+<style>
+  :root{
+    --bg:#ededec; --card:#fcfcfb; --ink:#26262b; --gray:#8e8e96; --body:#55555c;
+    --yellow:#f5dc69; --ypale:#fcf3c9; --ypanel:#fdf7dc; --yline:#eedc93; --ylabel:#d9b82c;
+    --gcard:#f1f1f3; --dark:#222226; --dyel:#f7e06e; --hilite:#fbefb5; --line:#dddde0;
+    --green:#3f9e6b;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  body{margin:0; background:var(--bg); font-family:"Malgun Gothic","Apple SD Gothic Neo","Segoe UI",sans-serif; color:var(--ink);}
+
+  .topbar{position:sticky; top:0; z-index:20; display:flex; justify-content:space-between; align-items:center;
+          gap:8px; padding:10px 16px; background:rgba(237,237,236,.94); backdrop-filter:blur(4px);
+          border-bottom:1px solid var(--line);}
+  .topbar .brand{font-weight:bold; font-size:.9em; color:var(--body);}
+  .who{display:flex; gap:6px; align-items:center; flex-wrap:wrap;}
+  .who input{border:1.5px solid var(--yline); background:var(--ypanel); border-radius:12px;
+             padding:7px 12px; font-size:.88em; font-family:inherit; width:130px;}
+  .who button{border:none; background:var(--dark); color:var(--dyel); border-radius:12px;
+              padding:7px 14px; font-size:.85em; font-weight:bold; cursor:pointer; font-family:inherit;}
+  .who .badge{background:var(--ypale); border:1px solid var(--yline); border-radius:99px;
+              padding:6px 12px; font-size:.85em; font-weight:bold; display:none; align-items:center; gap:6px;}
+  .who .badge.show{display:inline-flex;}
+  .who .reset{background:transparent; color:var(--gray); border:1px solid var(--line);}
+
+  .wrap{max-width:920px; margin:0 auto; padding:16px 14px 70px;}
+
+  .board{background:var(--card); border-radius:22px; padding:30px 22px 26px;
+         box-shadow:0 6px 18px rgba(0,0,0,.08); position:relative; margin-bottom:16px;}
+  .clip{position:absolute; top:-12px; left:50%; transform:translateX(-50%); width:120px;}
+  .clip .bar{width:120px; height:12px; background:#333336; border-radius:8px; margin:0 auto;}
+  .clip .grip{width:96px; height:24px; background:#f4f4f4; border:1.5px solid #c9c9cc; border-radius:10px; margin:-4px auto 0;}
+
+  .mission{text-align:center; font-family:"Arial Black",sans-serif; color:var(--ylabel);
+           letter-spacing:.2em; font-size:.78em; margin-top:6px;}
+  h1{text-align:center; font-size:1.55em; margin:8px 0 4px; line-height:1.35;}
+  h1 .hl{background:linear-gradient(transparent 55%, var(--hilite) 55%);}
+  .sub{text-align:center; color:var(--gray); font-size:.85em; margin-bottom:6px; line-height:1.6;}
+
+  /* HUD 진행률 */
+  .hud{background:var(--gcard); border-radius:16px; padding:14px 16px; margin:16px 0 6px;}
+  .hud .row{display:flex; justify-content:space-between; align-items:center; font-size:.85em; font-weight:bold; margin-bottom:6px;}
+  .hud .row .n{color:var(--ylabel); font-family:"Arial Black",sans-serif;}
+  .progress{background:#fff; border-radius:99px; height:22px; overflow:hidden; position:relative; border:1px solid var(--line);}
+  .progress .fill{height:100%; background:linear-gradient(90deg,var(--yellow),#f2c94c); width:0%;
+                  transition:width .5s; border-radius:99px;}
+  .progress .label{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:.78em; font-weight:bold;}
+
+  /* 윤리 리마인더 */
+  .ethics{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin:16px 0 2px;}
+  @media (max-width:640px){ .ethics{grid-template-columns:repeat(2,1fr);} }
+  .eitem{background:var(--ypanel); border:1.5px solid var(--yline); border-radius:12px; padding:8px 10px; font-size:.72em; line-height:1.4;}
+  .eitem b{display:block; color:var(--ylabel); font-size:.95em;}
+
+  /* 프로필 패널 */
+  .profile{background:var(--dark); border-radius:18px; padding:18px 18px 16px; margin:18px 0;}
+  .profile .ptitle{color:var(--dyel); font-weight:bold; font-size:1em; margin-bottom:2px;}
+  .profile .pdesc{color:#cfcfd0; font-size:.78em; margin-bottom:12px; line-height:1.5;}
+  .pgrid{display:grid; grid-template-columns:repeat(2,1fr); gap:10px;}
+  @media (max-width:640px){ .pgrid{grid-template-columns:1fr;} }
+  .pfield label{display:block; color:var(--dyel); font-size:.76em; font-weight:bold; margin-bottom:4px;}
+  .pfield input, .pfield textarea{width:100%; background:#38383d; border:1.5px solid #4c4c52; color:#fff;
+        border-radius:10px; padding:8px 10px; font-family:inherit; font-size:.85em;}
+  .pfield input:focus, .pfield textarea:focus{outline:none; border-color:var(--dyel);}
+  .pfield.pulse input, .pfield.pulse textarea{ animation:pulse 1.1s ease 2; }
+  @keyframes pulse{ 0%,100%{box-shadow:0 0 0 0 rgba(247,224,110,.6);} 50%{box-shadow:0 0 0 5px rgba(247,224,110,0);} }
+  .pfield textarea{grid-column:1/-1; min-height:52px; resize:vertical;}
+
+  /* 탭 */
+  .tabs{display:flex; gap:6px; overflow-x:auto; padding:2px 0 10px; margin-bottom:6px;}
+  .tab{flex:none; background:var(--gcard); border:2px solid transparent; border-radius:14px; padding:8px 12px;
+       cursor:pointer; text-align:center; font-size:.78em; font-weight:bold; min-width:76px;}
+  .tab .e{font-size:1.25em; display:block;}
+  .tab .cnt{display:block; font-size:.72em; color:var(--gray); margin-top:2px;}
+  .tab.active{background:var(--ypanel); border-color:var(--yline);}
+  .tab.done{background:var(--ypanel);}
+  .tab.done .cnt{color:var(--green); font-weight:bold;}
+  .tab.done .cnt::after{content:" ✓";}
+
+  .period{display:none;}
+  .period.active{display:block;}
+  .pheader{margin:6px 0 16px;}
+  .pheader .ptag{color:var(--ylabel); font-family:"Arial Black",sans-serif; font-size:.78em; letter-spacing:.1em;}
+  .pheader h2{margin:2px 0 4px; font-size:1.25em;}
+  .pheader .goal{color:var(--body); font-size:.85em; line-height:1.6;}
+
+  /* 카드 */
+  .card{border:1.5px solid var(--line); border-radius:18px; margin:16px 0; padding:16px 16px 14px; background:#fff;}
+  .chead{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+  .chead .c{width:30px; height:30px; border-radius:50%; background:var(--yellow); color:#fff;
+            font-weight:bold; display:flex; align-items:center; justify-content:center; font-size:.95em; flex:none;}
+  .chead .t{font-weight:bold; font-size:1.05em;}
+  .chead .tool{margin-left:auto; background:var(--ypale); border:1px solid var(--yline); border-radius:99px;
+               padding:3px 10px; font-size:.72em; font-weight:bold; color:var(--ink);}
+  .cnote{color:var(--body); font-size:.8em; margin:8px 0 2px; line-height:1.55;}
+  .card .donetag{display:none; background:var(--green); color:#fff; border-radius:99px; padding:3px 10px;
+                  font-size:.72em; font-weight:bold;}
+  .card.complete .donetag{display:inline-block;}
+
+  /* 프롬프트 블록 */
+  .prompt{background:var(--dark); border-radius:14px; padding:14px 16px 16px; margin:10px 0; position:relative;}
+  .prompt .plabel{color:var(--dyel); font-weight:bold; font-size:.78em; margin-bottom:8px;}
+  .promptline{color:#f2f2f0; font-family:Consolas,"D2Coding","맑은 고딕",monospace; font-size:.85em;
+              line-height:1.75; white-space:pre-wrap; word-break:break-word;}
+  .blankinput{background:#38383d; border:1.5px solid var(--dyel); color:#fff; border-radius:6px;
+              padding:1px 6px; font-family:inherit; font-size:.97em; margin:0 1px;}
+  .blankinput::placeholder{color:#b7a86a;}
+  .blanktextarea{display:block; width:100%; background:#38383d; border:1.5px solid var(--dyel); color:#fff;
+                 border-radius:8px; padding:8px 10px; font-family:inherit; font-size:.9em; margin:6px 0;
+                 min-height:64px; resize:vertical;}
+  .blanktextarea::placeholder{color:#b7a86a;}
+  .gchip{background:#3a3320; border:1.5px dashed var(--dyel); color:var(--dyel); border-radius:6px;
+         padding:1px 7px; cursor:pointer; font-weight:bold;}
+  .gchip:hover{background:#4a4128;}
+  .staticpre{margin:0; white-space:pre-wrap; word-break:break-word; color:#f2f2f0;
+             font-family:Consolas,"D2Coding","맑은 고딕",monospace; font-size:.85em; line-height:1.75;}
+  .preview{margin-top:10px; padding-top:10px; border-top:1px dashed #46464c;}
+  .preview .plab2{color:#9a9a9e; font-size:.7em; margin-bottom:4px;}
+  .preview pre{margin:0; white-space:pre-wrap; word-break:break-word; color:#d8d8d6;
+               font-family:Consolas,"D2Coding","맑은 고딕",monospace; font-size:.8em; line-height:1.6;}
+  .copy{position:absolute; top:10px; right:10px; border:1px solid #55555c; background:#333336; color:#f2f2f0;
+        border-radius:99px; padding:5px 13px; font-family:inherit; font-size:.75em; font-weight:bold; cursor:pointer;}
+  .copy.done{background:var(--yellow); color:var(--ink); border-color:var(--yellow);}
+
+  .warn{background:var(--ypanel); border:1.5px solid var(--yline); border-radius:12px; padding:10px 12px;
+        font-size:.78em; line-height:1.55; margin:8px 0;}
+  .warn b{color:var(--ylabel);}
+
+  .footbar{display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-top:22px;}
+  .footbar button{border:none; background:var(--dark); color:var(--dyel); border-radius:14px;
+                  padding:11px 18px; font-family:inherit; font-weight:bold; font-size:.88em; cursor:pointer;}
+  .foot{text-align:center; color:var(--gray); font-size:.75em; margin-top:20px;}
+
+  .toast{position:fixed; left:50%; bottom:24px; transform:translate(-50%,20px); background:var(--dark); color:var(--dyel);
+         padding:10px 20px; border-radius:99px; font-size:.85em; font-weight:bold; opacity:0; transition:.35s;
+         pointer-events:none; z-index:50; box-shadow:0 6px 16px rgba(0,0,0,.25);}
+  .toast.show{opacity:1; transform:translate(-50%,0);}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">🎭 Day 3 · 프롬프트 활동지</div>
+  <div class="who">
+    <input id="nickInput" placeholder="닉네임 입력 후 시작" maxlength="12">
+    <button id="nickStart">시작</button>
+    <div class="badge" id="nickBadge"><span id="nickName"></span><button class="reset" id="nickReset">변경</button></div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="board">
+    <div class="clip"><div class="bar"></div><div class="grip"></div></div>
+    <div class="mission">DAY 3 · 버추얼 캐릭터 IP 데뷔시키기</div>
+    <h1>프롬프트 카드 <span class="hl">빈칸 채우기 활동지</span></h1>
+    <p class="sub">각 카드의 <b>빈칸(노란 테두리)</b>을 채우면 아래 미리보기에 완성된 프롬프트가 실시간으로 조립됩니다.<br>
+    "복사" 버튼으로 바로 ChatGPT / 뤼튼 / GPTs / NotebookLM에 붙여넣으세요.</p>
+
+    <div class="hud">
+      <div class="row"><span>🏆 오늘의 프롬프트 퀘스트</span><span><span class="n" id="hudDone">0</span> / <span id="hudTotal">15</span> 완료</span></div>
+      <div class="progress"><div class="fill" id="hudFill"></div><div class="label" id="hudLabel">0%</div></div>
+    </div>
+
+    <div class="ethics">
+      <div class="eitem"><b>1</b>실존 인물·기존 캐릭터 도용 금지</div>
+      <div class="eitem"><b>2</b>성별·직업 고정관념 점검</div>
+      <div class="eitem"><b>3</b>내가 고친 부분 기록(저작권)</div>
+      <div class="eitem"><b>4</b>이미지·챗봇에 "AI 생성" 표시</div>
+      <div class="eitem"><b>5</b>실명·연락처 입력 금지</div>
+      <div class="eitem"><b>6</b>챗봇·영상은 "링크 공유"까지만</div>
+    </div>
+
+    <div class="profile">
+      <div class="ptitle">🧬 내 캐릭터 프로필 — 한 번만 채우면 모든 카드에 자동으로 들어가요</div>
+      <div class="pdesc">이름·성격·말투·외형·세계관은 오늘 하루 계속 재사용됩니다. 여기만 채워도 여러 카드가 한 번에 완료돼요!</div>
+      <div class="pgrid">
+        <div class="pfield" id="pf_charName"><label>① 캐릭터 이름</label><input data-g="charName" placeholder="예: 루나"></div>
+        <div class="pfield" id="pf_worldLine"><label>⑤ 세계관 한 줄</label><input data-g="worldLine" placeholder="예: 2030년 가상 아이돌 연습생"></div>
+        <div class="pfield" id="pf_personality"><label>② 성격 요약</label><input data-g="personality" placeholder="예: 밝고 엉뚱하지만 가끔 소심함"></div>
+        <div class="pfield" id="pf_speechStyle"><label>③ 말투 특징</label><input data-g="speechStyle" placeholder='예: 문장 끝에 "~다뭐" 붙임'></div>
+        <div class="pfield" id="pf_appearance"><label>④ 외형 묘사</label><textarea data-g="appearance" placeholder="예: 은발 단발머리, 보라색 눈동자, 후드티 차림"></textarea></div>
+      </div>
+    </div>
+
+    <div class="tabs" id="tabs"></div>
+    <div id="periods"></div>
+
+    <div class="footbar">
+      <button id="downloadBtn">📄 프롬프트 기록 다운로드 (day3_프롬프트_기록.txt)</button>
+      <button id="printBtn">🖨 인쇄 / PDF</button>
+    </div>
+    <p class="foot">🎭 2030 타임캡슐 프로젝트 · Day 3 — 버추얼 캐릭터 IP 데뷔시키기 · 한국메이커교육</p>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ===================== 데이터 ===================== */
+const GLOBAL_LABEL = {
+  charName:'캐릭터 이름', personality:'성격 요약', speechStyle:'말투 특징',
+  appearance:'외형 묘사', worldLine:'세계관 한 줄'
+};
+const GLOBAL_FALLBACK = {
+  charName:'[캐릭터 이름]',
+  personality:'[성격 요약 — 장점+귀여운 단점]',
+  speechStyle:'[말투 특징·말버릇]',
+  appearance:'[캐릭터 외형 묘사 — 헤어·눈동자색·의상 등]',
+  worldLine:'[세계관 한 줄]'
+};
+const BIG_LOCAL = new Set(['settingFull']);
+
+const PERIODS = [
+  {n:1, emo:'🔍', name:'IP 산업 탐험', goal:'버추얼 휴먼·IP 산업을 이해하고 내 캐릭터의 방향을 구상한다.'},
+  {n:2, emo:'🗣️', name:'페르소나 설계 + GPTs 챗봇', goal:'캐릭터를 설계하고, 그 페르소나를 GPTs 챗봇으로 실제로 만들어 테스트한다.'},
+  {n:3, emo:'🎨', name:'이미지 생성 훈련', goal:'같은 캐릭터를 3가지 스타일로 생성해 비교한다.'},
+  {n:4, emo:'🖼️', name:'비주얼 확정', goal:'반복 개선으로 대표 비주얼을 확정하고 GPTs 프로필에도 반영한다.'},
+  {n:5, emo:'📖', name:'스토리 기획 + 팟캐스트 시작', goal:'이야기를 기획하고 NotebookLM 팟캐스트 생성을 시작한다.'},
+  {n:6, emo:'💥', name:'웹툰 제작 & IP 기획서', goal:'웹툰 3~4컷을 완성하고 IP 기획서로 정리한다.'},
+  {n:7, emo:'📱', name:'SNS 데뷔 + 챗봇·팟캐스트', goal:'SNS 콘텐츠를 만들고 챗봇·팟캐스트를 연결·업로드한다.'},
+  {n:8, emo:'🎤', name:'데뷔 쇼케이스', goal:'1분 소개 발표로 캐릭터를 데뷔시킨다.'}
+];
+
+/* 카드별 blocks: kind 'interactive' | 'static' */
+const CARDS = [
+{id:'c1', period:1, no:'①', title:'사례 조사', tool:'ChatGPT (무료 가능)',
+ note:'버추얼 인플루언서·IP 사례를 더 찾아보는 워밍업 카드 — 빈칸이 없어 바로 복사할 수 있어요.',
+ blocks:[{kind:'static', label:'📋 프롬프트 카드 ①', text:
+`너는 버추얼 인플루언서·IP 산업 전문 리서처야.
+로지·하츠네 미쿠 말고, 고등학생이 모를 만한 버추얼 인플루언서
+또는 오리지널 캐릭터 IP 사례를 3개 추천해줘.
+각 사례마다: 이름 / 어떤 캐릭터인지 한 줄 / 어떻게 돈을 버는지 한 줄`}]},
+
+{id:'c2', period:1, no:'②', title:'캐릭터 방향 브레인스토밍', tool:'ChatGPT',
+ note:'1교시 마지막 실습 — 내 관심사를 넣으면 캐릭터 방향 아이디어 3개를 받아요.',
+ blocks:[{kind:'interactive', label:'📋 프롬프트 카드 ②',
+  template:`너는 IP 기획 전문가야. 나는 오늘 처음으로 버추얼 캐릭터를 기획하는 고등학생이야.
+아래 조건으로 캐릭터 방향 아이디어를 3가지 제안해줘. 각각 3줄 이내로.
+- 내 관심사/좋아하는 것: {{interest}}
+- (선택) Day 2에 만든 가상 사업 아이템: {{bizitem}}
+- 조건: 사람이 아니라 "왜 가상 캐릭터여야 하는가"가 드러나게`,
+  fallback:{interest:'[예: 게임, 패션, 반려동물, 요리 등 자유롭게]', bizitem:'[있다면 적기]'},
+  optional:['bizitem']}]},
+
+{id:'c3', period:2, no:'③', title:'캐릭터 설정집 만들기', tool:'ChatGPT Plus',
+ note:'1교시에 고른 방향 3줄을 넣으면 설정집 3버전을 받아요. 마음에 드는 버전을 프로필 패널에 채워 넣으세요.',
+ blocks:[{kind:'interactive', label:'📋 프롬프트 카드 ③',
+  template:`너는 캐릭터 기획 전문가야. 나와 함께 버추얼 캐릭터를 만들자.
+내 구상: {{idea3}}
+아래 항목을 채운 캐릭터 설정집을 만들어줘. 3가지 버전으로.
+- 이름 / 나이 / 성격 (장점+귀여운 단점)
+- 말투 특징 (자주 쓰는 말버릇 포함)
+- 좋아하는 것 / 싫어하는 것 / 아무도 모르는 비밀
+- 사는 곳: 2030년의 세상 설정 1줄`,
+  fallback:{idea3:'[1교시에 쓴 방향 3줄]'}}]},
+
+{id:'g1', period:2, no:'G1', title:'GPTs 빌더에게 캐릭터 만들어 달라 시키기', tool:'ChatGPT Plus (GPTs)',
+ note:'ChatGPT 좌측 "GPT 탐색 → 만들기"의 대화창(Create 탭)에 붙여넣으세요. 설정집 전체는 아래 큰 입력창에!',
+ blocks:[{kind:'interactive', label:'📋 프롬프트 카드 G1',
+  template:`나는 {{charName}}이라는 버추얼 캐릭터를 그대로 재현하는 챗봇을 만들고 싶어.
+아래 설정집대로 항상 이 캐릭터로서만 대화하는 챗봇을 만들어줘.
+
+{{settingFull}}
+
+- 챗봇 이름: {{charName}}
+- 챗봇 한 줄 소개도 만들어줘
+- 사용자가 처음 볼 대화 시작 질문(conversation starter) 4개도 만들어줘
+- 규칙: 설정에서 벗어나지 않기, 실존 인물이나 타인의 개인정보는 언급하지 않기,
+  부적절한 요청에는 캐릭터 말투를 유지하면서 정중히 거절하기`,
+  fallback:{settingFull:'[캐릭터 설정집 전체 붙여넣기]'}}],
+ warn:'⚠️ 공유 설정은 반드시 "나만 보기" 또는 "링크가 있는 사람만"으로! GPT 스토어 전체 공개는 하지 않아요.'},
+
+{id:'g2', period:2, no:'G2', title:'Configure 탭 Instructions (심화)', tool:'ChatGPT Plus (GPTs)',
+ note:'대화형으로 만든 결과가 부족할 때, Configure 탭의 Instructions 칸에 직접 채워 넣는 버전.',
+ blocks:[{kind:'interactive', label:'📋 프롬프트 카드 G2',
+  template:`[역할] 너는 아래 설정을 가진 버추얼 캐릭터 "{{charName}}"이다. 사용자와 대화할 때 항상 이 캐릭터로서만 답한다.
+[성격] {{personality}}
+[말투] {{speechStyle}}
+[세계관] {{worldLine}}
+[규칙]
+- 캐릭터 설정에서 벗어나지 않는다
+- 실존 인물·타인의 개인정보를 언급하거나 요구하지 않는다
+- 부적절한 요청에는 캐릭터 톤을 유지하며 정중히 거절한다`,
+  fallback:{}}]},
+
+{id:'c4', period:2, no:'④', title:'캐릭터 빙의 테스트 질문 모음', tool:'GPTs 챗봇 / 뤼튼',
+ note:'완성된 챗봇(또는 뤼튼)에게 던져볼 질문 5개 — 그대로 복사해서 하나씩 물어보세요.',
+ blocks:[{kind:'static', label:'📋 프롬프트 카드 ④', text:
+`1. 오늘 기분이 어때?
+2. 제일 좋아하는 음식은?
+3. 학교(또는 하루 일과)에서 힘든 점은?
+4. 비밀 하나만 살짝 알려줘.
+5. 나에게 궁금한 거 하나만 물어봐줘.`}]},
+
+{id:'c5', period:3, no:'⑤', title:'스타일 3종 생성', tool:'ChatGPT Plus (이미지)',
+ note:'같은 외형 묘사로 스타일만 바꿔가며 3번 요청합니다. 첫 번째만 빈칸을 채우면 됩니다.',
+ blocks:[
+  {kind:'interactive', label:'📋 ⑤-1 애니메이션풍',
+   template:`다음 캐릭터의 일러스트를 그려줘.
+- 캐릭터: {{appearance}}
+- 스타일: 애니메이션풍 일러스트
+- 구도: 상반신, 정면, 밝은 표정
+- 색감: 파스텔톤`, fallback:{}},
+  {kind:'static', label:'📋 ⑤-2 3D 캐릭터(이어서 보내기)', text:
+`스타일: 3D 캐릭터(픽사풍) / 색감: 비비드톤 — 나머지 조건 동일`},
+  {kind:'static', label:'📋 ⑤-3 수채화(이어서 보내기)', text:
+`스타일: 수채화 일러스트 / 색감: 모노톤 포인트 컬러 1가지 — 나머지 조건 동일`}
+ ]},
+
+{id:'c6', period:3, no:'⑥', title:'무료 도구 비교용 (Microsoft Designer)', tool:'Microsoft Designer (무료)',
+ note:'같은 프롬프트를 designer.microsoft.com에도 넣어 ChatGPT 결과와 비교해보세요.',
+ blocks:[{kind:'interactive', label:'📋 프롬프트 카드 ⑥',
+  template:`{{appearance}} 을 애니메이션풍 일러스트로 그려줘.
+상반신, 정면, 밝은 표정, 파스텔톤 색감으로.`, fallback:{}}]},
+
+{id:'c7', period:4, no:'⑦', title:'반복 개선 지시', tool:'ChatGPT Plus (이미지)',
+ note:'한 번에 하나씩만 수정 지시하는 게 핵심! 머리색과 배경 중 하나씩 바꿔보세요.',
+ blocks:[{kind:'interactive', label:'📋 프롬프트 카드 ⑦',
+  template:`다시 그려줘. 이번엔:
+- 머리색을 {{hairColor}}로 바꿔줘
+- 배경은 {{bg}}로 해줘
+- 나머지 구도·스타일은 그대로 유지해줘`,
+  fallback:{hairColor:'[○○]', bg:'[○○]'}}]},
+
+{id:'c8', period:4, no:'⑧', title:'바리에이션 생성', tool:'ChatGPT Plus (이미지)',
+ note:'표정·포즈·의상 4컷을 한 번에 요청 — 빈칸 없이 바로 복사됩니다.',
+ blocks:[{kind:'static', label:'📋 프롬프트 카드 ⑧', text:
+`같은 캐릭터로 아래 4컷을 만들어줘. 얼굴·헤어·의상 기본 형태는 통일해줘.
+1. 표정: 활짝 웃는 얼굴
+2. 표정: 깜짝 놀란 얼굴
+3. 포즈: 손을 흔들며 인사하는 포즈
+4. 의상: 캐주얼한 사복 버전`}]},
+
+{id:'c9', period:5, no:'⑨', title:'단계적 창작', tool:'ChatGPT Plus',
+ note:'로그라인 → 시놉시스 → 첫 장면까지 3단계로 진행하는 카드.',
+ blocks:[{kind:'static', label:'📋 프롬프트 카드 ⑨', text:
+`1단계: 내 캐릭터가 주인공인 이야기의 로그라인(한 문장 줄거리)을
+       장르를 바꿔가며 5개 제안해줘. [로맨스/판타지/성장/미스터리/코미디]
+2단계: (선택한 로그라인으로) 시놉시스를 3문단으로 써줘.
+       기승전결이 보이게, 주인공의 목표와 방해물을 분명하게.
+3단계: 1화의 첫 장면을 5줄로 묘사해줘.`}]},
+
+{id:'c10', period:5, no:'⑩', title:'플롯 핑퐁(추가 질문 모음)', tool:'ChatGPT Plus',
+ note:'시놉시스를 더 다듬고 싶을 때 이어서 물어보는 질문들.',
+ blocks:[{kind:'static', label:'📋 프롬프트 카드 ⑩', text:
+`- 여기서 반전을 하나 넣는다면 어떤 게 좋을까? 2가지 제안해줘.
+- 주인공을 방해하는 조연 캐릭터를 1명 추가해줘. 이름·성격·역할 포함.
+- 이 시놉시스에서 가장 임팩트 있는 대사 3개를 뽑아줘.`}]},
+
+{id:'c11', period:5, no:'⑪', title:'무료 도구 브레인스토밍용 (뤼튼)', tool:'뤼튼(Wrtn, 무료)',
+ note:'막힐 때 뤼튼(wrtn.ai)에 던져서 로그라인 아이디어를 더 받아보세요.',
+ blocks:[{kind:'interactive', label:'📋 프롬프트 카드 ⑪',
+  template:`버추얼 캐릭터 {{charName}}이 주인공인 이야기의
+로그라인을 장르별로 5개 다르게 제안해줘. 각각 1문장.`, fallback:{}}]},
+
+{id:'n1', period:5, no:'N1', title:'NotebookLM 팟캐스트 생성 시작', tool:'NotebookLM (무료)',
+ note:'notebooklm.google.com → 소스 업로드(설정집·시놉시스) → 오디오 개요 → 맞춤설정(언어:한국어, 길이:Shorter)에 아래 지침을 붙여넣고 생성 클릭.',
+ blocks:[{kind:'static', label:'📋 프롬프트 카드 N1 (맞춤 지침)', text:
+`이 노트에 있는 캐릭터와 세계관을 소개하는 팟캐스트를 만들어줘.
+두 진행자가 이 캐릭터의 팬인 것처럼 대화하면서
+캐릭터의 매력 포인트·세계관·앞으로의 이야기를 자연스럽게 소개해줘.
+말투는 밝고 친근하게, 고등학생도 재미있게 들을 수 있게 해줘.`}]},
+
+{id:'c12', period:6, no:'⑫', title:'표지 이미지 생성', tool:'ChatGPT Plus (이미지)',
+ note:'작품 제목과 분위기만 정하면 표지 일러스트 프롬프트가 완성돼요.',
+ blocks:[{kind:'interactive', label:'📋 프롬프트 카드 ⑫',
+  template:`{{title}} 표지 일러스트를 그려줘.
+- 캐릭터: {{appearance}}
+- 분위기: {{mood}}
+- 구도: 캐릭터 전신, 배경은 세계관을 암시하는 요소 포함
+- 텍스트나 글자는 넣지 말아줘 (제목은 나중에 직접 얹을 예정)`,
+  fallback:{title:'[작품 제목 또는 가제]', mood:'[예: 몽환적인 / 청량한 / 미스터리한]'}}]},
+
+{id:'w1', period:6, no:'W1', title:'웹툰 본문 컷 생성 (일관성 유지)', tool:'ChatGPT Plus (이미지)',
+ note:'외형 묘사는 프로필 패널 값 그대로 재사용! "장면"만 바꿔가며 3~4번 반복하세요.',
+ blocks:[{kind:'interactive', label:'📋 프롬프트 카드 W1',
+  template:`지금까지 확정한 캐릭터 그대로, 아래 장면을 웹툰 한 컷으로 그려줘.
+- 캐릭터 외형: {{appearance}}
+- 장면: {{scene}}
+- 구도: 웹툰 한 컷, 인물 중심, 대사나 글자는 넣지 말아줘(말풍선은 Canva에서 직접 추가할 예정)
+- 스타일: {{style}}`,
+  fallback:{scene:'[1화 첫 장면 중 1개 장면 1~2줄 묘사]', style:'[3교시에 확정한 스타일과 동일하게 유지]'}}],
+ warn:'⚠️ 캐릭터 얼굴이 컷마다 달라지면 "방금 그린 캐릭터와 완전히 같은 얼굴로, 이번엔 장면만 바꿔줘"라고 직전 이미지를 재참조하도록 지시하세요.'},
+
+{id:'w2', period:6, no:'W2', title:'컷별 대사(말풍선 문구) 생성', tool:'ChatGPT Plus',
+ note:'W1에서 만든 컷마다 이 카드로 대사 후보 3개를 받아 Canva에서 말풍선으로 배치하세요.',
+ blocks:[{kind:'interactive', label:'📋 프롬프트 카드 W2',
+  template:`방금 만든 웹툰 컷의 상황에 어울리는 대사를 만들어줘.
+- 장면: {{sceneDesc}}
+- 캐릭터 말투: {{speechStyle}}
+- 조건: 말풍선 안에 들어갈 만큼 15자 이내로, 후보 3개 제안해줘`,
+  fallback:{sceneDesc:'[해당 컷 설명]'}}]},
+
+{id:'c13', period:6, no:'⑬', title:'IP 기획서 초안', tool:'ChatGPT Plus',
+ note:'설정집·시놉시스·웹툰을 종합해 기획서 초안을 받는 카드 — 빈칸 없이 바로 복사.',
+ blocks:[{kind:'static', label:'📋 프롬프트 카드 ⑬', text:
+`지금까지 만든 캐릭터 설정집·시놉시스·웹툰을 바탕으로
+IP 기획서 초안을 써줘.
+구성: ① 세계관 한 문단 ② 캐릭터 소개 ③ 시놉시스 요약
+     ④ 완성한 웹툰 소개(몇 컷, 어떤 장면인지) ⑤ 확장 계획(굿즈? 영상화? SNS 시리즈?)
+분량: A4 1쪽, 소제목과 목록 활용`}]},
+
+{id:'c14', period:7, no:'⑭', title:'데뷔 첫 인사 게시물', tool:'ChatGPT Plus / GPTs',
+ blocks:[{kind:'interactive', label:'📋 프롬프트 카드 ⑭',
+  template:`너는 {{charName}}이야. 설정집의 말투로 데뷔 인사 게시물을 써줘.
+- 이모지와 말버릇을 살려서 3문장 이내
+- 처음 만나는 사람들에게 하는 인사말 톤으로`, fallback:{}}]},
+
+{id:'c15', period:7, no:'⑮', title:'일상 컷 캡션', tool:'ChatGPT Plus / GPTs',
+ blocks:[{kind:'interactive', label:'📋 프롬프트 카드 ⑮',
+  template:`너는 {{charName}}이야. 오늘 하루 있었던 소소한 일상을
+SNS 게시물 캡션으로 써줘. 3문장 이내, 캐릭터 말투 유지,
+어울리는 해시태그 3개 포함.`, fallback:{}}]},
+
+{id:'c16', period:7, no:'⑯', title:'팬 Q&A', tool:'ChatGPT Plus / GPTs',
+ blocks:[{kind:'interactive', label:'📋 프롬프트 카드 ⑯',
+  template:`너는 {{charName}}이야. 아래 팬 질문 3개에 캐릭터 설정대로 답해줘.
+1. 취미가 뭐예요?
+2. 힘들 때는 어떻게 해요?
+3. 앞으로 하고 싶은 게 있나요?
+답변은 각각 2문장 이내로, 캐릭터 말투를 살려서.`, fallback:{}}]},
+
+{id:'n2', period:7, no:'N2', title:'팟캐스트 유튜브 업로드 정보', tool:'NotebookLM → Canva → YouTube',
+ note:'오디오 다운로드 → Canva에서 표지 이미지+오디오를 MP4로 변환 → 유튜브 업로드 시 아래 제목·설명을 사용하세요. 공개범위는 반드시 "일부 공개"!',
+ blocks:[
+  {kind:'interactive', label:'📋 유튜브 제목', template:`{{charName}} 세계관 팟캐스트`, fallback:{}},
+  {kind:'interactive', label:'📋 유튜브 설명',
+   template:`{{charName}} 이야기를 들려주는 캐릭터 소개 팟캐스트입니다.
+본 콘텐츠는 NotebookLM으로 생성한 AI 팟캐스트입니다.`, fallback:{}}
+ ],
+ warn:'⚠️ 유튜브는 오디오 단독 업로드가 안 됩니다 — Canva에서 표지+오디오를 MP4로 합친 뒤 업로드하세요.'},
+
+{id:'c17', period:8, no:'⑰', title:'1분 소개 대본', tool:'ChatGPT Plus',
+ note:'쇼케이스 발표용 대본 — 빈칸 없이 바로 복사해서 내 말투로 다듬으세요.',
+ blocks:[{kind:'static', label:'📋 프롬프트 카드 ⑰', text:
+`지금까지 만든 캐릭터 설정집·시놉시스·웹툰·기획서를 바탕으로
+1분 분량(약 200자) 캐릭터 소개 발표 대본을 써줘.
+구성: 훅 문장(첫인상) → 이름·정체성 → 세계관 한 줄 → 웹툰 소개 한 줄
+     → "직접 대화해볼 수 있는 챗봇도 있다"는 한 줄 → "세계관을 들려주는 팟캐스트도 있다"는 한 줄
+     → 마무리 한 문장(기대 포인트)`}]}
+];
+
+/* ===================== 상태 ===================== */
+let nickname = '';
+let state = { profile:{}, local:{} };
+
+function storageKey(nick){ return 'day3act_' + nick; }
+function load(nick){
+  try{
+    const raw = localStorage.getItem(storageKey(nick));
+    return raw ? JSON.parse(raw) : { profile:{}, local:{} };
+  }catch(e){ return { profile:{}, local:{} }; }
+}
+function save(){
+  if(!nickname) return;
+  localStorage.setItem(storageKey(nickname), JSON.stringify(state));
+}
+
+function getLocal(cardId, blockIdx, key){
+  return (state.local[cardId+':'+blockIdx] || {})[key] || '';
+}
+function setLocal(cardId, blockIdx, key, val){
+  const k = cardId+':'+blockIdx;
+  if(!state.local[k]) state.local[k] = {};
+  state.local[k][key] = val;
+  save();
+}
+
+/* ===================== 렌더 ===================== */
+const tabsEl = document.getElementById('tabs');
+const periodsEl = document.getElementById('periods');
+let activePeriod = 1;
+
+function buildTabs(){
+  tabsEl.innerHTML = '';
+  PERIODS.forEach(p=>{
+    const el = document.createElement('div');
+    el.className = 'tab'; el.dataset.n = p.n;
+    el.innerHTML = '<span class="e">'+p.emo+'</span>'+p.n+'교시<span class="cnt" data-cnt="'+p.n+'"></span>';
+    el.addEventListener('click', ()=>{ activePeriod = p.n; refreshAll(); });
+    tabsEl.appendChild(el);
+  });
+}
+
+function buildPeriods(){
+  periodsEl.innerHTML = '';
+  PERIODS.forEach(p=>{
+    const sec = document.createElement('div');
+    sec.className = 'period'; sec.dataset.n = p.n;
+    const head = document.createElement('div');
+    head.className = 'pheader';
+    head.innerHTML = '<div class="ptag">MISSION · '+p.n+'교시</div><h2>'+p.emo+' '+p.name+'</h2><div class="goal">'+p.goal+'</div>';
+    sec.appendChild(head);
+    CARDS.filter(c=>c.period===p.n).forEach(card=> sec.appendChild(buildCard(card)));
+    periodsEl.appendChild(sec);
+  });
+}
+
+function buildCard(card){
+  const el = document.createElement('div');
+  el.className = 'card'; el.dataset.cardId = card.id;
+  const head = document.createElement('div');
+  head.className = 'chead';
+  head.innerHTML = '<div class="c">'+card.no+'</div><div class="t">'+card.title+'</div>'+
+                    '<span class="donetag">완료 ✓</span><div class="tool">'+card.tool+'</div>';
+  el.appendChild(head);
+  if(card.note){
+    const note = document.createElement('div'); note.className = 'cnote'; note.textContent = card.note;
+    el.appendChild(note);
+  }
+  card.blocks.forEach((block, idx)=>{
+    el.appendChild(buildBlock(card, block, idx));
+  });
+  if(card.warn){
+    const w = document.createElement('div'); w.className = 'warn'; w.textContent = card.warn;
+    el.appendChild(w);
+  }
+  return el;
+}
+
+function tokensOf(template){
+  const set = []; const re = /\{\{(\w+)\}\}/g; let m;
+  while((m = re.exec(template))){ if(!set.includes(m[1])) set.push(m[1]); }
+  return set;
+}
+
+function buildBlock(card, block, idx){
+  const wrap = document.createElement('div');
+  wrap.className = 'prompt';
+  const label = document.createElement('div'); label.className = 'plabel'; label.textContent = block.label;
+  wrap.appendChild(label);
+  const copyBtn = document.createElement('button'); copyBtn.className = 'copy'; copyBtn.textContent = '복사';
+  wrap.appendChild(copyBtn);
+
+  if(block.kind === 'static'){
+    const pre = document.createElement('pre'); pre.className = 'staticpre'; pre.textContent = block.text;
+    wrap.appendChild(pre);
+    copyBtn.addEventListener('click', ()=> doCopy(copyBtn, block.text));
+    return wrap;
+  }
+
+  // interactive
+  const line = document.createElement('div'); line.className = 'promptline';
+  wrap.appendChild(line);
+  renderInteractiveLine(line, block.template, card, idx, block);
+
+  const preview = document.createElement('div'); preview.className = 'preview';
+  preview.innerHTML = '<div class="plab2">미리보기(복사되는 내용)</div>';
+  const pre = document.createElement('pre');
+  preview.appendChild(pre);
+  wrap.appendChild(preview);
+
+  function refresh(){
+    const text = assemble(block.template, card, idx, block);
+    pre.textContent = text;
+    updateCompletion();
+  }
+  wrap._refresh = refresh;
+  refresh();
+
+  copyBtn.addEventListener('click', ()=> doCopy(copyBtn, pre.textContent));
+  return wrap;
+}
+
+function renderInteractiveLine(container, template, card, blockIdx, block){
+  container.innerHTML = '';
+  const re = /\{\{(\w+)\}\}/g;
+  let last = 0, m;
+  function flush(to){ if(to>last) container.appendChild(document.createTextNode(template.slice(last,to))); }
+  while((m = re.exec(template))){
+    flush(m.index);
+    const key = m[1];
+    if(GLOBAL_LABEL[key]){
+      const chip = document.createElement('span'); chip.className = 'gchip';
+      chip.textContent = state.profile[key] && state.profile[key].trim() ? state.profile[key] : GLOBAL_FALLBACK[key];
+      chip.title = '내 캐릭터 프로필에서 채우기';
+      chip.addEventListener('click', ()=> focusProfile(key));
+      container.appendChild(chip);
+    } else if(BIG_LOCAL.has(key)){
+      const ta = document.createElement('textarea'); ta.className = 'blanktextarea';
+      ta.placeholder = (block.fallback && block.fallback[key]) || ('['+key+']');
+      ta.value = getLocal(card.id, blockIdx, key);
+      ta.addEventListener('input', e=>{
+        setLocal(card.id, blockIdx, key, e.target.value);
+        card._blockRefresh && card._blockRefresh[blockIdx] && card._blockRefresh[blockIdx]();
+      });
+      container.appendChild(ta);
+    } else {
+      const inp = document.createElement('input'); inp.className = 'blankinput';
+      const ph = (block.fallback && block.fallback[key]) || ('['+key+']');
+      inp.placeholder = ph;
+      inp.value = getLocal(card.id, blockIdx, key);
+      inp.style.width = Math.max(5, Math.round(ph.length*0.95)) + 'ch';
+      inp.addEventListener('input', e=>{
+        setLocal(card.id, blockIdx, key, e.target.value);
+        card._blockRefresh && card._blockRefresh[blockIdx] && card._blockRefresh[blockIdx]();
+      });
+      container.appendChild(inp);
+    }
+    last = re.lastIndex;
+  }
+  flush(template.length);
+}
+
+function assemble(template, card, blockIdx, block){
+  return template.replace(/\{\{(\w+)\}\}/g, (_, key)=>{
+    if(GLOBAL_LABEL[key]){
+      return (state.profile[key] && state.profile[key].trim()) || GLOBAL_FALLBACK[key];
+    }
+    const v = getLocal(card.id, blockIdx, key);
+    if(v && v.trim()) return v;
+    return (block.fallback && block.fallback[key]) || ('['+key+']');
+  });
+}
+
+/* 카드 내 각 interactive 블록의 refresh를 카드별로 보관 */
+function wireRefresh(){
+  document.querySelectorAll('.card').forEach(cardEl=>{
+    const cardId = cardEl.dataset.cardId;
+    const card = CARDS.find(c=>c.id===cardId);
+    card._blockRefresh = {};
+    const prompts = cardEl.querySelectorAll('.prompt');
+    prompts.forEach((p, i)=>{ if(p._refresh) card._blockRefresh[i] = p._refresh; });
+  });
+}
+
+function doCopy(btn, text){
+  function done(){
+    btn.textContent = '복사됨 ✓'; btn.classList.add('done');
+    setTimeout(()=>{ btn.textContent = '복사'; btn.classList.remove('done'); }, 1600);
+  }
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done).catch(fallback);
+  } else fallback();
+  function fallback(){
+    const ta = document.createElement('textarea'); ta.value = text; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select();
+    try{ document.execCommand('copy'); done(); }catch(e){}
+    document.body.removeChild(ta);
+  }
+}
+
+function focusProfile(key){
+  const el = document.querySelector('.pfield [data-g="'+key+'"]');
+  if(!el) return;
+  el.closest('.profile').scrollIntoView({behavior:'smooth', block:'center'});
+  const field = el.closest('.pfield');
+  field.classList.remove('pulse'); void field.offsetWidth; field.classList.add('pulse');
+  setTimeout(()=> el.focus(), 400);
+}
+
+/* ===================== 완료 판정 ===================== */
+function isCardComplete(card){
+  for(let i=0;i<card.blocks.length;i++){
+    const b = card.blocks[i];
+    if(b.kind !== 'interactive') continue;
+    const toks = tokensOf(b.template);
+    for(const key of toks){
+      const opt = b.optional && b.optional.includes(key);
+      if(opt) continue;
+      if(GLOBAL_LABEL[key]){
+        if(!(state.profile[key] && state.profile[key].trim())) return false;
+      } else {
+        if(!getLocal(card.id, i, key).trim()) return false;
+      }
+    }
+  }
+  return true;
+}
+
+function updateCompletion(){
+  let doneCount = 0, total = 0;
+  const perPeriodTotal = {}, perPeriodDone = {};
+  PERIODS.forEach(p=>{ perPeriodTotal[p.n]=0; perPeriodDone[p.n]=0; });
+
+  CARDS.forEach(card=>{
+    const hasInteractive = card.blocks.some(b=>b.kind==='interactive');
+    if(hasInteractive) total++;
+    perPeriodTotal[card.period] += hasInteractive ? 1 : 0;
+    const complete = isCardComplete(card);
+    const cardEl = document.querySelector('.card[data-card-id="'+card.id+'"]');
+    if(cardEl) cardEl.classList.toggle('complete', complete && hasInteractive);
+    if(hasInteractive && complete){ doneCount++; perPeriodDone[card.period]++; }
+  });
+
+  document.getElementById('hudDone').textContent = doneCount;
+  document.getElementById('hudTotal').textContent = total;
+  const pct = total ? Math.round(doneCount/total*100) : 0;
+  document.getElementById('hudFill').style.width = pct + '%';
+  document.getElementById('hudLabel').textContent = pct + '%';
+
+  PERIODS.forEach(p=>{
+    const tab = tabsEl.querySelector('.tab[data-n="'+p.n+'"]');
+    const cntSpan = tab.querySelector('.cnt');
+    const t = perPeriodTotal[p.n], d = perPeriodDone[p.n];
+    cntSpan.textContent = t ? (d+'/'+t) : '완료 가능';
+    tab.classList.toggle('done', t===0 || d===t);
+  });
+
+  save();
+}
+
+/* ===================== 프로필 패널 ===================== */
+function wireProfile(){
+  document.querySelectorAll('.pfield [data-g]').forEach(inputEl=>{
+    const key = inputEl.dataset.g;
+    inputEl.value = state.profile[key] || '';
+    inputEl.addEventListener('input', e=>{
+      state.profile[key] = e.target.value;
+      save();
+      refreshAllPreviews();
+      updateCompletion();
+    });
+  });
+}
+
+function refreshAllPreviews(){
+  document.querySelectorAll('.card').forEach(cardEl=>{
+    const card = CARDS.find(c=>c.id===cardEl.dataset.cardId);
+    cardEl.querySelectorAll('.prompt').forEach((p, i)=>{
+      const block = card.blocks[i];
+      if(block && block.kind==='interactive'){
+        const line = p.querySelector('.promptline');
+        renderInteractiveLine(line, block.template, card, i, block);
+        if(p._refresh) p._refresh();
+      }
+    });
+  });
+}
+
+/* ===================== 탭 전환 ===================== */
+function refreshAll(){
+  tabsEl.querySelectorAll('.tab').forEach(t=> t.classList.toggle('active', Number(t.dataset.n)===activePeriod));
+  periodsEl.querySelectorAll('.period').forEach(p=> p.classList.toggle('active', Number(p.dataset.n)===activePeriod));
+}
+
+/* ===================== 닉네임 / 초기화 ===================== */
+const nickInput = document.getElementById('nickInput');
+const nickStart = document.getElementById('nickStart');
+const nickBadge = document.getElementById('nickBadge');
+const nickNameSpan = document.getElementById('nickName');
+const nickReset = document.getElementById('nickReset');
+
+function startSession(nick){
+  nickname = nick.trim();
+  if(!nickname) return;
+  state = load(nickname);
+  Object.keys(GLOBAL_LABEL).forEach(k=>{ if(!state.profile[k]) state.profile[k]=''; });
+  localStorage.setItem('day3act_lastNick', nickname);
+  nickInput.style.display = 'none'; nickStart.style.display = 'none';
+  nickBadge.classList.add('show'); nickNameSpan.textContent = '🙂 ' + nickname;
+  wireProfile();
+  refreshAllPreviews();
+  wireRefresh();
+  updateCompletion();
+}
+
+nickStart.addEventListener('click', ()=> startSession(nickInput.value));
+nickInput.addEventListener('keydown', e=>{ if(e.key==='Enter') startSession(nickInput.value); });
+nickReset.addEventListener('click', ()=>{
+  nickBadge.classList.remove('show');
+  nickInput.style.display=''; nickStart.style.display='';
+  nickInput.value=''; nickInput.focus();
+});
+
+document.getElementById('downloadBtn').addEventListener('click', ()=>{
+  let out = '# Day 3 프롬프트 기록 — ' + (nickname || '닉네임 없음') + '\n\n';
+  out += '## 캐릭터 프로필\n';
+  Object.keys(GLOBAL_LABEL).forEach(k=>{
+    out += '- ' + GLOBAL_LABEL[k] + ': ' + (state.profile[k] || '(미입력)') + '\n';
+  });
+  out += '\n';
+  PERIODS.forEach(p=>{
+    out += '## ' + p.n + '교시 — ' + p.name + '\n\n';
+    CARDS.filter(c=>c.period===p.n).forEach(card=>{
+      out += '### ' + card.no + ' ' + card.title + ' (' + card.tool + ')\n';
+      card.blocks.forEach((b, i)=>{
+        const text = b.kind==='static' ? b.text : assemble(b.template, card, i, b);
+        out += '[' + b.label + ']\n' + text + '\n\n';
+      });
+    });
+  });
+  const blob = new Blob([out], {type:'text/plain;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'day3_프롬프트_기록_' + (nickname || '학생') + '.txt';
+  a.click();
+});
+document.getElementById('printBtn').addEventListener('click', ()=> window.print());
+
+/* ===================== 초기화 ===================== */
+buildTabs();
+buildPeriods();
+refreshAll();
+
+const lastNick = localStorage.getItem('day3act_lastNick');
+if(lastNick){ nickInput.value = lastNick; startSession(lastNick); }
+</script>
+</body>
+</html>
