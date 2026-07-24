@@ -1,82 +1,614 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🕰 2030 타임캡슐 — 나의 포트폴리오</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>햇살 미소 | Pastel Dream Portfolio</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap');
+    :root {
+      --pink: #ffcfe2;
+      --pink-soft: #ffe7f1;
+      --pink-milk: #fff3f8;
+      --blue: #eef7ff;
+      --purple: #f3e9ff;
+      --white: rgba(255, 255, 255, 0.9);
+      --text: #554656;
+      --muted: #827281;
+      --accent: #b45f91;
+      --accent-deep: #9b4f7e;
+      --shadow: 0 20px 52px rgba(178, 91, 139, 0.17);
+      --radius-xl: 34px;
+      --radius-lg: 26px;
+      --radius-md: 18px;
+    }
+
     * { box-sizing: border-box; }
-    body { font-family: 'Segoe UI', 'Malgun Gothic', sans-serif; margin: 0; background: #faf7ff; color: #333; }
-    header { background: linear-gradient(135deg, #a18cd1, #fbc2eb); padding: 50px 20px 40px; text-align: center; color: #fff; }
-    header img.profile { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 4px solid rgba(255,255,255,.7); box-shadow: 0 4px 12px rgba(0,0,0,.15); }
-    header h1 { margin: 14px 0 6px; font-size: 1.9em; }
-    header .role { margin: 0 0 4px; font-weight: 600; opacity: .95; }
-    header .catch { margin: 0; opacity: .85; font-style: italic; }
-    .container { max-width: 860px; margin: 0 auto; padding: 30px 16px; }
-    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; }
-    .card { background: #fff; border-radius: 14px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,.08); display: flex; flex-direction: column; }
-    .card img { width: 100%; height: 170px; object-fit: cover; background: #eee; }
-    .card .body { padding: 16px 18px 18px; display: flex; flex-direction: column; flex: 1; }
-    .card h2 { margin: 0 0 8px; font-size: 1.1em; }
-    .card p { margin: 0 0 14px; font-size: .93em; line-height: 1.55; color: #555; flex: 1; }
-    .card a.btn { align-self: flex-start; text-decoration: none; background: #7c5fc9; color: #fff; padding: 8px 14px; border-radius: 20px; font-size: .85em; }
-    .card a.btn:hover { background: #66489e; }
-    .outro { background: #fff; border-radius: 14px; padding: 22px; margin-top: 24px; box-shadow: 0 2px 10px rgba(0,0,0,.08); text-align: center; }
-    footer { text-align: center; padding: 28px 16px; color: #999; font-size: .85em; }
+    html { scroll-behavior: smooth; scroll-snap-type: y proximity; }
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: "Noto Sans KR", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 15% 12%, rgba(255,255,255,.95) 0 7%, transparent 22%),
+        radial-gradient(circle at 85% 18%, rgba(255,255,255,.7) 0 8%, transparent 23%),
+        radial-gradient(circle at 50% 92%, rgba(255, 204, 226, .32), transparent 32%),
+        linear-gradient(135deg, #ffd5e7 0%, #ffeaf2 36%, #f6edff 72%, #eef8ff 100%);
+      min-height: 100vh;
+      line-height: 1.7;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        radial-gradient(circle, rgba(255,255,255,.55) 1.5px, transparent 1.5px),
+        radial-gradient(circle, rgba(255,255,255,.35) 1px, transparent 1px);
+      background-size: 44px 44px, 70px 70px;
+      background-position: 0 0, 20px 15px;
+      opacity: .58;
+      z-index: -1;
+      animation: dreamyDrift 18s linear infinite alternate;
+    }
+
+    @keyframes dreamyDrift {
+      from { transform: translate3d(0, 0, 0); }
+      to { transform: translate3d(18px, -14px, 0); }
+    }
+
+    a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
+
+    .nav {
+      position: fixed;
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: min(92%, 760px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px;
+      border: 1px solid rgba(255,255,255,.8);
+      border-radius: 999px;
+      background: rgba(255,255,255,.76);
+      backdrop-filter: blur(18px) saturate(1.15);
+      box-shadow: 0 14px 36px rgba(174, 91, 137, .14), inset 0 1px 0 rgba(255,255,255,.8);
+    }
+
+    .nav a {
+      padding: 10px 18px;
+      border-radius: 999px;
+      font-size: .95rem;
+      font-weight: 700;
+      color: var(--muted);
+      transition: transform .28s ease, background .28s ease, color .28s ease, box-shadow .28s ease;
+    }
+
+    .nav a:hover,
+    .nav a:focus-visible,
+    .nav a.is-active {
+      background: linear-gradient(135deg, rgba(255,207,226,.95), rgba(243,233,255,.95));
+      color: var(--accent-deep);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 18px rgba(180,95,145,.13);
+    }
+
+    main {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 92px 0 54px;
+    }
+
+    section {
+      min-height: 92vh;
+      scroll-snap-align: start;
+      display: grid;
+      place-items: center;
+      scroll-margin-top: 90px;
+      padding: 42px 0;
+    }
+
+    .panel {
+      width: 100%;
+      opacity: 0;
+      transform: translateY(56px) scale(.965);
+      filter: blur(7px);
+      transition: opacity .82s ease, transform .92s cubic-bezier(.16,1,.3,1), filter .68s ease, box-shadow .34s ease;
+      padding: clamp(28px, 5vw, 58px);
+      background: linear-gradient(145deg, rgba(255,255,255,.93), rgba(255,248,252,.84));
+      border: 1px solid rgba(255,255,255,.95);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+
+    .panel.is-visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      filter: blur(0);
+    }
+
+    section.is-active .panel {
+      box-shadow: 0 28px 68px rgba(181, 88, 139, .22), 0 0 0 1px rgba(255,255,255,.58);
+    }
+
+    .section-title {
+      margin: 0 0 10px;
+      text-align: center;
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      letter-spacing: -.04em;
+    }
+
+    .section-kicker {
+      text-align: center;
+      color: var(--accent);
+      font-weight: 800;
+      text-shadow: 0 3px 14px rgba(180,95,145,.12);
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      font-size: .8rem;
+    }
+
+    .home-grid {
+      display: grid;
+      grid-template-columns: minmax(240px, 360px) 1fr;
+      align-items: center;
+      gap: clamp(28px, 6vw, 72px);
+    }
+
+    .profile-wrap {
+      position: relative;
+      padding: 18px;
+      border-radius: 42% 58% 62% 38% / 44% 42% 58% 56%;
+      background: linear-gradient(145deg, #ffc8df, #ffeaf3 42%, #efe6ff 78%, #eef8ff);
+      box-shadow: 0 24px 54px rgba(181,88,139,.22);
+      animation: float 5s ease-in-out infinite;
+    }
+
+    .profile-wrap img {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      border-radius: 38% 62% 56% 44% / 46% 42% 58% 54%;
+      background: #fff;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(-1deg); }
+      50% { transform: translateY(-10px) rotate(1deg); }
+    }
+
+    .home-copy h1 {
+      margin: 0;
+      font-size: clamp(3rem, 8vw, 6rem);
+      line-height: 1.02;
+      letter-spacing: -.06em;
+    }
+
+    .name-line {
+      display: inline-flex;
+      align-items: center;
+      gap: clamp(8px, 1.5vw, 18px);
+      position: relative;
+    }
+
+    .sketch-heart {
+      width: clamp(54px, 7vw, 88px);
+      height: auto;
+      overflow: visible;
+      transform: rotate(-7deg) translateY(4px);
+      filter: drop-shadow(0 5px 8px rgba(180, 95, 145, .14));
+    }
+
+    .sketch-heart path {
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: 340;
+      stroke-dashoffset: 340;
+    }
+
+    .sketch-heart .heart-main {
+      stroke: #e785b5;
+      stroke-width: 6.5;
+      opacity: .9;
+      animation: drawHeart 1.6s cubic-bezier(.65, 0, .35, 1) .7s forwards;
+    }
+
+    .sketch-heart .heart-pencil {
+      stroke: #c76a9f;
+      stroke-width: 2.8;
+      opacity: .56;
+      stroke-dasharray: 330;
+      stroke-dashoffset: 330;
+      animation: drawHeart 1.75s cubic-bezier(.65, 0, .35, 1) .9s forwards;
+    }
+
+    .sketch-heart .heart-highlight {
+      stroke: #f7b8d5;
+      stroke-width: 2.2;
+      opacity: .72;
+      stroke-dasharray: 90;
+      stroke-dashoffset: 90;
+      animation: drawHeart 1s ease 1.75s forwards;
+    }
+
+    .sketch-heart.is-drawn {
+      animation: heartSettle .8s cubic-bezier(.2, .8, .2, 1) 2.25s both;
+    }
+
+    @keyframes drawHeart {
+      to { stroke-dashoffset: 0; }
+    }
+
+    @keyframes heartSettle {
+      0% { transform: rotate(-7deg) translateY(4px) scale(.94); }
+      45% { transform: rotate(-3deg) translateY(1px) scale(1.08); }
+      100% { transform: rotate(-7deg) translateY(4px) scale(1); }
+    }
+
+    .role {
+      display: inline-flex;
+      margin: 18px 0 12px;
+      padding: 8px 16px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #ffe1ed, #f3e9ff);
+      font-weight: 800;
+      color: #6c5a87;
+    }
+
+    .catchphrase {
+      margin: 0;
+      font-size: clamp(1.4rem, 4vw, 2.3rem);
+      font-weight: 800;
+      color: var(--accent);
+    }
+
+    .about-copy {
+      max-width: 830px;
+      margin: 36px auto 0;
+      display: grid;
+      gap: 18px;
+      font-size: clamp(1rem, 2.3vw, 1.18rem);
+      text-align: center;
+    }
+
+    .about-copy p {
+      margin: 0;
+      line-height: 1.48;
+      padding: 20px 24px;
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, rgba(255,219,235,.76), rgba(255,243,248,.78), rgba(241,231,255,.68));
+      border: 1px solid rgba(255,255,255,.72);
+      box-shadow: 0 10px 24px rgba(180,95,145,.07);
+    }
+
+    .cards {
+      margin-top: 34px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 24px;
+    }
+
+    .card {
+      position: relative;
+      overflow: hidden;
+      border-radius: var(--radius-lg);
+      background: rgba(255,255,255,.92);
+      border: 1px solid rgba(255,255,255,.9);
+      box-shadow: 0 15px 36px rgba(135, 84, 119, .12);
+      transform: translateY(0) scale(1);
+      transition: transform .42s cubic-bezier(.2,.8,.2,1), box-shadow .42s ease, border-color .42s ease;
+    }
+
+    .card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,.16) 48%, transparent 66%);
+      transform: translateX(-135%);
+      transition: transform .9s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-8px) scale(1.008);
+      border-color: rgba(255,207,226,.82);
+      box-shadow: 0 22px 42px rgba(186, 96, 145, .18), 0 0 0 3px rgba(255,223,237,.18);
+    }
+
+    .card.is-shining::after { transform: translateX(125%); }
+
+    .card img {
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      object-fit: cover;
+      background: linear-gradient(135deg, var(--pink), var(--blue), var(--purple));
+      transition: transform .55s cubic-bezier(.2,.8,.2,1), filter .55s ease;
+    }
+
+    .card:hover img {
+      transform: scale(1.045);
+      filter: saturate(1.06) brightness(1.02);
+    }
+
+    .card-body { padding: 24px; }
+    .card h3 { margin: 0 0 12px; font-size: 1.35rem; }
+    .card p { margin: 0 0 18px; color: var(--muted); }
+
+    .card-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #ffd5e6, #f1e5ff);
+      color: #76516f;
+      font-weight: 800;
+      box-shadow: 0 8px 18px rgba(180,95,145,.1);
+      transition: transform .28s ease, box-shadow .28s ease, background .28s ease;
+    }
+
+    .card-link:hover {
+      transform: translateX(5px);
+      background: linear-gradient(135deg, #ffc9df, #eadcff);
+      box-shadow: 0 12px 24px rgba(180,95,145,.18);
+    }
+
+    .outro-text {
+      max-width: 760px;
+      margin: 30px auto 0;
+      text-align: center;
+      font-size: clamp(1.2rem, 3vw, 1.8rem);
+      font-weight: 700;
+      line-height: 1.55;
+      letter-spacing: -0.01em;
+      text-wrap: balance;
+    }
+
+    #outro .panel {
+      position: relative;
+      overflow: hidden;
+    }
+
+    #outro .panel::before, #outro .panel::after {
+      content: "✦";
+      position: absolute;
+      color: rgba(201,116,163,.28);
+      font-size: 2rem;
+      animation: sparkle 3.6s ease-in-out infinite;
+    }
+    #outro .panel::before { top: 22%; left: 10%; }
+    #outro .panel::after { right: 11%; bottom: 22%; animation-delay: 1.2s; }
+
+    @keyframes sparkle {
+      0%,100% { transform: scale(.8) rotate(0deg); opacity: .28; }
+      50% { transform: scale(1.16) rotate(12deg); opacity: .68; }
+    }
+
+
+    #outro {
+      align-content: center;
+      row-gap: 14px;
+    }
+
+    .back-to-top-wrap {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+      padding: 0;
+      margin: 0;
+    }
+
+    .back-to-top {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 22px;
+      border-radius: 999px;
+      color: #7f5d73;
+      background: linear-gradient(135deg, var(--pink), var(--blue), var(--purple));
+      border: 1px solid rgba(255,255,255,.88);
+      box-shadow: 0 10px 24px rgba(126, 91, 126, .16);
+      font-weight: 800;
+      text-decoration: none;
+      transition: transform .22s ease, box-shadow .22s ease;
+    }
+
+    .back-to-top:hover,
+    .back-to-top:focus-visible {
+      transform: translateY(-3px);
+      box-shadow: 0 14px 28px rgba(126, 91, 126, .22);
+      outline: none;
+    }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      padding: 6px 0 28px;
+      font-size: .9rem;
+    }
+
+    @media (max-width: 760px) {
+      .nav { gap: 2px; padding: 8px; top: 10px; }
+      .nav a { padding: 9px 11px; font-size: .82rem; }
+      main { padding-top: 74px; }
+      section { min-height: auto; padding: 26px 0; }
+      .home-grid { grid-template-columns: 1fr; text-align: center; }
+      .name-line { justify-content: center; }
+      .profile-wrap { width: min(290px, 82vw); margin: 0 auto; }
+      .cards { grid-template-columns: 1fr; }
+      .panel { border-radius: 26px; }
+    }
+  
+    /* Cute font pairing */
+    h1, h2, h3, .section-title, .hero-title, .brand-name, .nav a,
+    button, .button, .home, .edit-btn, .add-label, .reset-btn,
+    .back-to-top, .modal-title, .password-modal h2 {
+      font-family: "Jua", "Noto Sans KR", sans-serif;
+      font-weight: 400;
+      letter-spacing: 0.01em;
+    }
+    p, li, .guide, .caption, input, textarea {
+      font-family: "Noto Sans KR", sans-serif;
+    }
   </style>
 </head>
 <body>
-  <header>
-    <!-- Day 1 미래 프로필 이미지 (images/profile.png 로 교체됩니다) -->
-    <img class="profile" src="images/profile.png" alt="2030 프로필">
-    <h1>🕰 2030년의 나</h1>
-    <p class="role">닉네임 · 2030 미래 직함을 여기에</p>
-    <p class="catch">"캐치프레이즈를 여기에"</p>
-  </header>
+  <nav class="nav" aria-label="주요 메뉴">
+    <a href="#home">홈</a>
+    <a href="#about">소개</a>
+    <a href="#work">포트폴리오</a>
+    <a href="#outro">마무리</a>
+  </nav>
 
-  <div class="container">
-    <div class="cards">
-      <div class="card">
-        <img src="images/day1_poster.png" alt="Day 1 나 사용설명서">
-        <div class="body">
-          <h2>🌅 Day 1 — 나 사용설명서</h2>
-          <p>VARK·MBTI·가치 단어로 나를 분석하고, 2030년의 나를 설계했다. 미래 명함과 AI 비서까지 — 여정의 시작.</p>
-          <a class="btn" href="day1-me/">📂 산출물 보기</a>
+  <main>
+    <section id="home">
+      <div class="panel home-grid">
+        <div class="profile-wrap">
+          <img src="images/profile.png" alt="햇살 미소 프로필 이미지" />
+        </div>
+        <div class="home-copy">
+          <div class="section-kicker">Pastel Dream Portfolio</div>
+          <div class="name-line">
+            <h1>햇살 미소</h1>
+            <svg class="sketch-heart is-drawn" viewBox="0 0 110 96" aria-hidden="true">
+              <path class="heart-main" d="M55 84 C39 70 16 55 14 35 C12 19 24 10 37 13 C46 15 52 23 55 31 C59 22 66 15 76 13 C90 10 101 21 98 38 C94 59 73 72 55 84" />
+              <path class="heart-pencil" d="M53 86 C35 72 13 57 12 36 C11 20 23 8 38 11 C47 13 53 21 56 29 C61 19 69 12 79 12 C93 12 102 24 98 41 C93 61 72 76 53 86" />
+              <path class="heart-highlight" d="M24 31 C27 21 36 18 43 22" />
+            </svg>
+          </div>
+          <div class="role">2030년의 직함 · 교사</div>
+          <p class="catchphrase">행복을 만들다.</p>
         </div>
       </div>
-      <div class="card">
-        <img src="images/day2_infographic.png" alt="Day 2 인포그래픽">
-        <div class="body">
-          <h2>📊 Day 2 — 데이터로 검증한 미래 사업</h2>
-          <p>구미시 상가 20,286곳의 실제 데이터를 수사해 내 사업의 가능성을 숫자로 증명했다. 감이 아니라 데이터로!</p>
-          <a class="btn" href="day2-data/">📂 산출물 보기</a>
-        </div>
-      </div>
-      <div class="card">
-        <img src="images/day3_character.png" alt="Day 3 캐릭터">
-        <div class="body">
-          <h2>🎭 Day 3 — 나의 캐릭터 IP</h2>
-          <p>세상에 없던 캐릭터를 만들어 성격과 세계관을 입히고 SNS로 데뷔시켰다. 원작자는 나!</p>
-          <a class="btn" href="day3-character/">📂 산출물 보기</a>
-        </div>
-      </div>
-      <div class="card">
-        <img src="images/day4_brand.png" alt="Day 4 브랜드">
-        <div class="body">
-          <h2>🛍️ Day 4 — 나의 브랜드</h2>
-          <p>내 캐릭터를 전속 모델로 K-브랜드를 론칭했다. 로고부터 굿즈, 한/영 카피까지 담은 룩북 완성.</p>
-          <a class="btn" href="day4-brand/">📂 산출물 보기</a>
-        </div>
-      </div>
-    </div>
+    </section>
 
-    <div class="outro">
-      <h2>🌐 타임캡슐 개봉</h2>
-      <p>5일간의 여정 소감 한 줄을 여기에 남겨 보세요.</p>
-    </div>
-  </div>
+    <section id="about">
+      <div class="panel">
+        <div class="section-kicker">About Me</div>
+        <h2 class="section-title">다정한 마음으로 만드는 변화</h2>
+        <div class="about-copy">
+          <p>사람의 마음을 깊이 이해하고,<br>진심과 예의를 바탕으로 관계를 만들어가는 사람입니다.</p>
+          <p>눈앞의 성과보다 오래 간직할 수 있는 의미와 행복을 선택하며,<br>꿈을 현실로 만들기 위해 꾸준히 자신을 돌아봅니다.</p>
+          <p>조용하지만 따뜻한 영향력으로 누군가의 성장을 응원하고,<br>세상에 좋은 흔적을 남기고 싶은 사람입니다.</p>
+        </div>
+      </div>
+    </section>
 
-  <footer>구미여상 AI 5일 과정 · 이 페이지는 예시입니다 — Day 5에 ChatGPT와 함께 나만의 디자인으로 바꿔 보세요!<br>
-  이미지 경로는 <code>images/</code> 폴더의 영문 파일명 5장(profile · day1_poster · day2_infographic · day3_character · day4_brand)과 연결되어 있습니다.</footer>
+    <section id="work">
+      <div class="panel">
+        <div class="section-kicker">Portfolio</div>
+        <h2 class="section-title">5일 동안 만든 기록</h2>
+        <div class="cards">
+          <article class="card">
+            <img src="images/day1_poster.png" alt="Day1 나 사용설명서 대표 이미지" />
+            <div class="card-body">
+              <h3>Day1 나 사용설명서</h3>
+              <p>나의 성향과 강점을 살펴보고,<br>나를 더 잘 이해할 수 있도록<br>한눈에 정리한 자기소개 프로젝트입니다.</p>
+              <a class="card-link" href="day1-me/index.html">산출물 보기 →</a>
+            </div>
+          </article>
+
+          <article class="card">
+            <img src="images/day2_infographic.png" alt="Day2 창업 기획 대표 이미지" />
+            <div class="card-body">
+              <h3>Day2 창업 기획</h3>
+              <p>데이터에서 아이디어를 발견하고,<br>사용자의 필요를 해결하는 서비스로<br>구체화한 창업 기획 프로젝트입니다.</p>
+              <a class="card-link" href="day2-data/index.html">산출물 보기 →</a>
+            </div>
+          </article>
+
+          <article class="card">
+            <img src="images/day3_character.png" alt="Day3 캐릭터 대표 이미지" />
+            <div class="card-body">
+              <h3>Day3 캐릭터</h3>
+              <p>세계관과 성격, 말투를 설계하고,<br>하나의 이야기를 가진 캐릭터를<br>시각적으로 완성한 프로젝트입니다.</p>
+              <a class="card-link" href="day3-character/index.html">산출물 보기 →</a>
+            </div>
+          </article>
+
+          <article class="card">
+            <img src="images/day4_brand.png" alt="Day4 브랜드 대표 이미지" />
+            <div class="card-body">
+              <h3>Day4 브랜드</h3>
+              <p>아이디어에 이름과 분위기를 입히고,<br>일관된 이미지와 메시지로 표현한<br>브랜드 기획 프로젝트입니다.</p>
+              <a class="card-link" href="day4-brand/index.html">산출물 보기 →</a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="outro">
+      <div class="panel">
+        <div class="section-kicker">Outro</div>
+        <h2 class="section-title">여정을 마치며</h2>
+        <p class="outro-text">매일 새로운 AI 기술을 배우고 직접 결과물을 만들어 보며,<br>AI를 활용해 아이디어를 현실로 구현하는 즐거움과 역량을 함께 키울 수 있었습니다.</p>
+      </div>
+      <div class="back-to-top-wrap">
+        <a class="back-to-top" href="#home" aria-label="페이지 맨 위로 이동">↑ 맨 위로</a>
+      </div>
+    </section>
+  </main>
+
+
+  <footer>© 2030 햇살 미소. Made with a gentle dream.</footer>
+
+  <script>
+    const panels = document.querySelectorAll('.panel');
+    const sections = document.querySelectorAll('section');
+    const navLinks = document.querySelectorAll('.nav a');
+
+    const panelObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) entry.target.classList.add('is-visible');
+      });
+    }, { threshold: 0.26 });
+
+    panels.forEach((panel) => panelObserver.observe(panel));
+
+    const sectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          sections.forEach((section) => section.classList.remove('is-active'));
+          entry.target.classList.add('is-active');
+          navLinks.forEach((link) => {
+            link.classList.toggle('is-active', link.getAttribute('href') === `#${entry.target.id}`);
+          });
+        }
+      });
+    }, { threshold: 0.58 });
+
+    sections.forEach((section) => sectionObserver.observe(section));
+
+    const cards = document.querySelectorAll('.card');
+
+    function activateCardShine(activeCard) {
+      cards.forEach((card) => card.classList.toggle('is-shining', card === activeCard));
+    }
+
+    cards.forEach((card) => {
+      card.addEventListener('mouseenter', () => activateCardShine(card));
+      card.addEventListener('focusin', () => activateCardShine(card));
+      card.addEventListener('click', () => activateCardShine(card));
+      card.addEventListener('mouseleave', () => card.classList.remove('is-shining'));
+      card.addEventListener('focusout', (event) => {
+        if (!card.contains(event.relatedTarget)) card.classList.remove('is-shining');
+      });
+    });
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      document.documentElement.style.scrollBehavior = 'auto';
+      panels.forEach((panel) => panel.classList.add('is-visible'));
+      document.querySelectorAll('.sketch-heart path').forEach((path) => { path.style.animation = 'none'; path.style.strokeDashoffset = '0'; });
+    }
+  </script>
 </body>
 </html>

@@ -1,31 +1,57 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>📦 산출물 폴더로 이동 중…</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Day2 창업 기획 | 햇살 미소</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap');
+    :root { --pink:#ffe3ef; --blue:#e3f1ff; --purple:#efe5ff; --text:#51495f; --muted:#7d7488; --shadow:0 18px 45px rgba(111,92,139,.14); }
+    *{box-sizing:border-box} body{margin:0;min-height:100vh;color:var(--text);font-family:"Noto Sans KR",system-ui,sans-serif;background:linear-gradient(135deg,var(--pink),var(--blue) 48%,var(--purple));}
+    body::before{content:"";position:fixed;inset:0;pointer-events:none;background-image:radial-gradient(circle,rgba(255,255,255,.55) 1.5px,transparent 1.5px);background-size:44px 44px;opacity:.45}
+    a{text-decoration:none;color:inherit}.wrap{width:min(1180px,calc(100% - 32px));margin:auto;padding:34px 0 56px;position:relative;z-index:1}
+    .top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:28px;padding:20px 24px;background:rgba(255,255,255,.82);border:1px solid rgba(255,255,255,.9);border-radius:28px;box-shadow:var(--shadow);backdrop-filter:blur(12px)}
+    .home{display:inline-flex;padding:11px 17px;border-radius:999px;background:linear-gradient(135deg,var(--pink),var(--purple));font-weight:800}.top h1{margin:0;font-size:clamp(1.5rem,4vw,2.4rem);letter-spacing:-.04em}
+    .guide{text-align:left;color:var(--muted);margin:0;flex:1}.guide-row{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:0 0 24px}.gallery{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}
+    .item{border:0;padding:0;border-radius:24px;overflow:hidden;background:rgba(255,255,255,.9);box-shadow:0 13px 30px rgba(111,92,139,.13);cursor:pointer;transition:.25s ease}.item:hover{transform:translateY(-6px);box-shadow:0 20px 38px rgba(111,92,139,.2)}
+    .item img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;background:linear-gradient(135deg,var(--pink),var(--blue),var(--purple))}.caption{padding:13px 14px;font-size:.9rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .empty{grid-column:1/-1;text-align:center;padding:46px 24px;background:rgba(255,255,255,.82);border-radius:28px;box-shadow:var(--shadow);color:var(--muted)}
+    .lightbox{position:fixed;inset:0;display:none;place-items:center;padding:24px;background:rgba(56,44,70,.72);z-index:9999}.lightbox.open{display:grid}.lightbox img{max-width:min(1100px,94vw);max-height:88vh;border-radius:24px;box-shadow:0 25px 70px rgba(0,0,0,.35);background:white}
+
+    .actions{display:flex;justify-content:flex-end;align-items:center;gap:8px;flex-wrap:wrap;margin:0}.edit-btn,.add-label,.reset-btn{border:0;border-radius:999px;padding:11px 17px;font:inherit;font-weight:800;cursor:pointer;box-shadow:0 10px 22px rgba(111,92,139,.12)}.edit-btn{background:linear-gradient(135deg,#ffb9d3,#d9c8ff);color:#51495f}.add-label{background:#fff;color:#b34f7e}.reset-btn{background:#fff0f5;color:#9c496d}.edit-notice{text-align:center;margin:-10px 0 20px;color:var(--muted);font-size:.88rem}.media-button{display:block;width:100%;border:0;padding:0;background:transparent;cursor:pointer}.item{position:relative}.item img,.item video{display:block;width:100%;aspect-ratio:4/3;object-fit:contain;background:linear-gradient(135deg,var(--pink),var(--blue),var(--purple))}.item video{cursor:auto}.delete-button{position:absolute;top:12px;right:12px;z-index:3;border:0;border-radius:999px;padding:8px 12px;background:rgba(91,55,72,.86);color:#fff;font-weight:800;cursor:pointer;box-shadow:0 8px 18px rgba(0,0,0,.18)}.editing .item{outline:2px dashed rgba(210,102,151,.4);outline-offset:3px}.lightbox-content img{max-width:min(1100px,94vw);max-height:88vh;border-radius:24px;box-shadow:0 25px 70px rgba(0,0,0,.35);background:white}
+    @media(max-width:650px){.top{align-items:flex-start;flex-direction:column}.guide-row{align-items:flex-start}.guide{font-size:.92rem}.actions{flex-shrink:0}.gallery{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}}@media(max-width:520px){.gallery{grid-template-columns:1fr}}
+  
+    /* Cute font pairing */
+    h1, h2, h3, .section-title, .hero-title, .brand-name, .nav a,
+    button, .button, .home, .edit-btn, .add-label, .reset-btn,
+    .back-to-top, .modal-title, .password-modal h2 {
+      font-family: "Jua", "Noto Sans KR", sans-serif;
+      font-weight: 400;
+      letter-spacing: 0.01em;
+    }
+    p, li, .guide, .caption, input, textarea {
+      font-family: "Noto Sans KR", sans-serif;
+    }
+  </style>
 </head>
-<body style="font-family:'Segoe UI','Malgun Gothic',sans-serif;text-align:center;padding:70px 20px;color:#444;background:#faf7ff;">
-  <p style="font-size:1.3em;">📦 산출물 폴더로 이동 중…</p>
-  <p id="fallback" style="display:none;color:#777;line-height:1.7;">
-    이 페이지는 GitHub Pages에 배포된 뒤에 동작합니다.<br>
-    지금은 GitHub 저장소에서 이 폴더를 직접 열어 보세요.
-  </p>
+<body>
+  <main class="wrap">
+    <header class="top"><a class="home" href="../index.html#work">← 나가기</a><h1>Day2 창업 기획</h1></header>
+    <div class="guide-row">
+      <p class="guide">이미지는 클릭하면 크게 볼 수 있고, 영상은 재생 버튼으로 바로 실행할 수 있어요.</p>
+      <div class="actions">
+        <button id="editButton" class="edit-btn" type="button">수정</button>
+        <label id="addLabel" class="add-label" hidden>이미지·영상 추가<input id="addMedia" type="file" accept="image/*,video/*" multiple hidden></label>
+        <button id="resetButton" class="reset-btn" type="button" hidden>기본 상태로</button>
+      </div>
+    </div>
+    <p id="editNotice" class="edit-notice" hidden>추가·삭제 내용은 현재 브라우저에 저장됩니다.</p>
+    <section id="gallery" class="gallery" aria-label="Day2 창업 기획 갤러리"></section>
+  </main>
+  <div id="lightbox" class="lightbox" aria-hidden="true"><div id="lightboxContent" class="lightbox-content"></div></div>
   <script>
-    (function () {
-      var h = location.hostname;
-      if (h.slice(-10) === '.github.io') {
-        var user = h.split('.')[0];
-        var parts = location.pathname.split('/').filter(Boolean);
-        if (parts[parts.length - 1] === 'index.html') parts.pop();
-        var folder = parts[parts.length - 1];
-        // 프로젝트 페이지(user.github.io/repo/...)면 첫 조각이 저장소 이름
-        var repo = parts.length >= 2 ? parts[0] : user + '.github.io';
-        location.replace('https://github.com/' + user + '/' + repo + '/tree/main/' + folder);
-      } else {
-        document.getElementById('fallback').style.display = 'block';
-      }
-    })();
+    window.GALLERY_CONFIG = { pageKey: "day2-data", files: ["day2_01.png", "day2_02.png", "day2_03.png", "day2_04.png"] };
   </script>
+  <script src="../gallery-editor.js"></script>
 </body>
 </html>
